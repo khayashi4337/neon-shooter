@@ -40,7 +40,7 @@ const CPU_PIERCE_IDEAL_DIST:   float = 380.0  # PIERCE：遠距離ポジショ�
 const CPU_PIERCE_FIRE_RANGE:   float = 600.0  # PIERCE：射程延長
 const CPU_SPEED_IDEAL_DIST:    float = 200.0  # SPEED：側面接近
 const CPU_RAPID_IDEAL_DIST:    float = 160.0  # RAPID：弾幕接近
-const CPU_ARMOR_IDEAL_DIST:    float = 100.0  # ARMOR：正面突進
+const CPU_ARMOR_IDEAL_DIST:    float = 120.0  # ARMOR2回以上：積極突進
 
 var SPEED_BASE: float
 var FIRE_RATE_BASE: float
@@ -249,14 +249,15 @@ func _handle_cpu(delta: float) -> void:
 		ideal_dist = CPU_PIERCE_IDEAL_DIST
 		fire_range = CPU_PIERCE_FIRE_RANGE
 	elif max_hp > GameConfig.player_hp:
-		# ARMOR：HP残量に応じて戦術を動的に切り替え
+		# ARMOR：取得回数が多いほど積極的、HP瀕死時のみ守り
 		var hp_ratio = float(hp) / float(max_hp)
-		if hp_ratio > 0.6:
-			ideal_dist = 180.0  # HP高 → 積極的に詰める（射線回避は維持）
-		elif hp_ratio > 0.3:
-			ideal_dist = CPU_IDEAL_DIST  # HP中 → 通常距離
+		var armor_level = max_hp / GameConfig.player_hp  # 2=1回, 4=2回
+		if hp_ratio < 0.3:
+			ideal_dist = CPU_PIERCE_IDEAL_DIST  # HP瀕死 → 遠距離で守り
+		elif armor_level >= 4:
+			ideal_dist = CPU_ARMOR_IDEAL_DIST  # 2回以上ARMOR → 要塞化して積極突進
 		else:
-			ideal_dist = CPU_PIERCE_IDEAL_DIST  # HP低 → 遠距離で慎重に
+			ideal_dist = CPU_IDEAL_DIST  # 1回ARMOR → 通常距離
 	elif fire_rate_mult > 1.0:
 		# RAPID：接近して弾幕を張る
 		ideal_dist = CPU_RAPID_IDEAL_DIST
@@ -287,10 +288,23 @@ func _handle_cpu(delta: float) -> void:
 	velocity = (dir + _cpu_jitter).normalized() * SPEED_BASE * speed_mult * CPU_SPEED_RATIO
 	move_and_slide()
 
-	# --- 射撃：パワーアップ別の射程内で撃つ ---
+	# --- 射撃：偏差打ち + フェイント ---
 	if dist < fire_range and fire_cd <= 0.0:
 		fire_cd = FIRE_RATE_BASE / fire_rate_mult
-		_rpc_fire.rpc(global_position, rotation)
+		var aim_angle: float
+		var roll = randf()
+		if roll < 0.15:
+			# フェイント：狙いをわずかにずらす（約20度以内）
+			aim_angle = rotation + randf_range(-0.35, 0.35)
+		elif roll < 0.50:
+			# 予測射撃：プレイヤーの移動先を狙う
+			var time_to_hit = dist / GameConfig.bullet_speed
+			var predicted = _cpu_target.global_position + _cpu_target.velocity * time_to_hit * 0.6
+			aim_angle = (predicted - global_position).angle()
+		else:
+			# 通常：現在位置を狙う
+			aim_angle = rotation
+		_rpc_fire.rpc(global_position, aim_angle)
 
 @rpc("authority", "call_local", "unreliable_ordered")
 func _rpc_sync(pos: Vector2, rot: float) -> void:
