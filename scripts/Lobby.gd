@@ -97,6 +97,7 @@ func _on_ngrok_response(result: int, _code: int, _headers: PackedStringArray, bo
 func _show_ngrok_url(url: String) -> void:
 	_url_label.text = url
 	_url_row.show()
+	_ip_input.text = url
 	_status.text = "このURLを相手に送ってください ↑\n相手の接続を待っています..."
 
 func _on_copy() -> void:
