@@ -18,8 +18,11 @@ const EYE_OFFSET_X:  float = 11.0
 const EYE_OFFSET_Y:  float = 7.0
 
 # --- 入力定数 ---
-const PAD_DEADZONE:         float = 0.2
+const PAD_DEADZONE:          float = 0.2
 const PAD_TRIGGER_THRESHOLD: float = 0.5
+
+# --- 弾定数 ---
+const BULLET_DAMAGE: int = 20
 
 # --- CPU AI 定数 ---
 const CPU_IDEAL_DIST:         float = 260.0
@@ -260,7 +263,7 @@ func _rpc_fire(pos: Vector2, angle: float) -> void:
 	b.direction = Vector2(cos(angle), sin(angle))
 	b.owner_id = player_id
 	b.can_pierce = can_pierce
-	b.damage = 20
+	b.damage = BULLET_DAMAGE
 	var game = get_tree().get_first_node_in_group("game")
 	if game:
 		game.add_bullet(b)
