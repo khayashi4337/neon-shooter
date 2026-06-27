@@ -166,14 +166,30 @@ func _on_player_died(dead_id: int) -> void:
 		return
 	_round_active = false
 
-	var winner_id = -1
-	for pid in _players:
-		if pid != dead_id:
-			winner_id = pid
-
+	var winner_id = _resolve_round_winner(dead_id)
 	_wins[winner_id] = _wins.get(winner_id, 0) + 1
 	_update_score_ui()
+	_show_round_result(winner_id)
 
+	if _check_game_over():
+		return
+
+	await get_tree().create_timer(POWERUP_SHOW_DELAY).timeout
+	_center_msg.text = ""
+
+	var my_id = multiplayer.get_unique_id()
+	if Network.game_mode == "cpu" and dead_id != my_id:
+		_handle_cpu_powerup(dead_id)
+	else:
+		_powerup_menu.show_menu(dead_id, dead_id == my_id)
+
+func _resolve_round_winner(dead_id: int) -> int:
+	for pid in _players:
+		if pid != dead_id:
+			return pid
+	return -1
+
+func _show_round_result(winner_id: int) -> void:
 	var my_id = multiplayer.get_unique_id()
 	if winner_id == my_id:
 		_center_msg.text = "WIN"
@@ -184,25 +200,15 @@ func _on_player_died(dead_id: int) -> void:
 		_center_msg.modulate = Color.MAGENTA
 		AudioManager.play_round_lose()
 
-	if _check_game_over():
-		return
-
-	await get_tree().create_timer(POWERUP_SHOW_DELAY).timeout
-	_center_msg.text = ""
-
-	# CPUモードでCPUが負けた場合は自動選択
-	if Network.game_mode == "cpu" and dead_id != my_id:
-		var cpu_node = _players.get(dead_id)
-		var choices = ["SPEED", "RAPID", "ARMOR", "PIERCE"]
-		var pick: String
-		if is_instance_valid(cpu_node) and cpu_node.hp < cpu_node.max_hp * 0.4:
-			pick = "ARMOR"  # HP低下時は防御優先
-		else:
-			pick = choices[randi() % choices.size()]
-		_rpc_apply_powerup.rpc(dead_id, pick)
-		return
-
-	_powerup_menu.show_menu(dead_id, dead_id == my_id)
+func _handle_cpu_powerup(dead_id: int) -> void:
+	var cpu_node = _players.get(dead_id)
+	var choices = ["SPEED", "RAPID", "ARMOR", "PIERCE"]
+	var pick: String
+	if is_instance_valid(cpu_node) and cpu_node.hp < cpu_node.max_hp * 0.4:
+		pick = "ARMOR"
+	else:
+		pick = choices[randi() % choices.size()]
+	_rpc_apply_powerup.rpc(dead_id, pick)
 
 func _on_powerup_chosen_local(loser_id: int, pw: String) -> void:
 	_powerup_menu.hide_menu()
