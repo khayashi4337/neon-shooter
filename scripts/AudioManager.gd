@@ -11,7 +11,28 @@ func _ready() -> void:
 		_players.append(p)
 
 func play_shoot() -> void:
-	_play_tone(880.0, 0.06, 0.35)
+	_play_gunshot()
+
+func _play_gunshot() -> void:
+	var p = _get_free_player()
+	var gen = AudioStreamGenerator.new()
+	var duration = 0.09
+	gen.mix_rate = SAMPLE_RATE
+	gen.buffer_length = duration + 0.05
+	p.stream = gen
+	p.volume_db = linear_to_db(0.75)
+	p.play()
+	var pb := p.get_stream_playback() as AudioStreamGeneratorPlayback
+	if not pb:
+		return
+	var frames = int(SAMPLE_RATE * duration)
+	for i in range(frames):
+		var t = float(i) / float(frames)
+		var env = exp(-t * 28.0)              # 急速指数減衰：鋭いアタック
+		var noise = randf() * 2.0 - 1.0       # ホワイトノイズ（主成分）
+		var body = sin(TAU * 110.0 * float(i) / SAMPLE_RATE)  # 低音ボディ
+		var sample = clamp((noise * 0.75 + body * 0.45) * env, -1.0, 1.0)
+		pb.push_frame(Vector2(sample, sample))
 
 func play_hit() -> void:
 	_play_noise(0.08, 0.5)
