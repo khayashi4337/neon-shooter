@@ -228,12 +228,15 @@ func _show_round_result(winner_id: int) -> void:
 
 func _handle_cpu_powerup(dead_id: int) -> void:
 	var cpu_node = _players.get(dead_id)
-	var pick: String
-	if is_instance_valid(cpu_node) and cpu_node.hp < cpu_node.max_hp * 0.4:
-		pick = "ARMOR"
-	else:
-		var pool = _powerup_menu.POWERUPS
-		pick = pool[randi() % pool.size()]
+	var pool: Array = _powerup_menu.POWERUPS.duplicate()
+	if is_instance_valid(cpu_node):
+		var armor_level = cpu_node.max_hp / GameConfig.player_hp  # 1=未取得, 2=1回, 4=2回
+		if armor_level >= 2:
+			# ARMORを既に持っている → 攻撃系を優先してARMORを除外
+			pool.erase("ARMOR")
+	if pool.is_empty():
+		pool = _powerup_menu.POWERUPS
+	var pick = pool[randi() % pool.size()]
 	_rpc_apply_powerup.rpc(dead_id, pick)
 
 func _on_powerup_chosen_local(loser_id: int, pw: String) -> void:
