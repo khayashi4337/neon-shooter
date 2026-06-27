@@ -14,8 +14,8 @@ var fire_rate: float = 0.28
 var volume: float = 0.8
 
 # 入力デバイス（"keyboard" or "gamepad"）
-var p1_device: String = "keyboard"
-var p2_device: String = "keyboard"
+var p1_device: String = "gamepad"
+var p2_device: String = "gamepad"
 var p1_gamepad_id: int = 0
 var p2_gamepad_id: int = 1
 
@@ -29,6 +29,21 @@ const CONFIG_PATH = "user://config.cfg"
 func _ready() -> void:
 	load_config()
 	_apply_volume()
+	_setup_move_actions()
+
+func _setup_move_actions() -> void:
+	_ensure_action("move_left",  [KEY_A, KEY_LEFT])
+	_ensure_action("move_right", [KEY_D, KEY_RIGHT])
+	_ensure_action("move_up",    [KEY_W, KEY_UP])
+	_ensure_action("move_down",  [KEY_S, KEY_DOWN])
+
+func _ensure_action(action: String, keys: Array) -> void:
+	if not InputMap.has_action(action):
+		InputMap.add_action(action)
+	for k in keys:
+		var ev = InputEventKey.new()
+		ev.keycode = k
+		InputMap.action_add_event(action, ev)
 
 func load_config() -> void:
 	var cfg = ConfigFile.new()
@@ -75,8 +90,8 @@ func reset_to_defaults() -> void:
 	bullet_speed     = 520.0
 	fire_rate        = 0.28
 	volume           = 0.8
-	p1_device        = "keyboard"
-	p2_device        = "keyboard"
+	p1_device        = "gamepad"
+	p2_device        = "gamepad"
 	p1_gamepad_id    = 0
 	p2_gamepad_id    = 1
 	ngrok_poll_interval = 1.0

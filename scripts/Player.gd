@@ -33,7 +33,8 @@ func _ready() -> void:
 	FIRE_RATE_BASE = GameConfig.fire_rate
 	hp             = GameConfig.player_hp
 	max_hp         = GameConfig.player_hp
-	set_multiplayer_authority(player_id)
+	# CPUプレイヤーは常にサーバー（id=1）が制御
+	set_multiplayer_authority(1 if is_cpu else player_id)
 	_setup_visuals()
 
 func _setup_visuals() -> void:
@@ -117,8 +118,10 @@ func _physics_process(delta: float) -> void:
 		_rpc_sync.rpc(global_position, rotation)
 
 func _handle_input() -> void:
-	var use_pad = (GameConfig.p1_device == "gamepad" if player_id == 1 else GameConfig.p2_device == "gamepad")
-	var pad_id  = (GameConfig.p1_gamepad_id if player_id == 1 else GameConfig.p2_gamepad_id)
+	var cfg_device = GameConfig.p1_device if player_id == 1 else GameConfig.p2_device
+	var pad_id     = GameConfig.p1_gamepad_id if player_id == 1 else GameConfig.p2_gamepad_id
+	# パッドが接続されていなければキーボードにフォールバック
+	var use_pad = (cfg_device == "gamepad" and pad_id in Input.get_connected_joypads())
 
 	# 移動
 	var dir: Vector2
@@ -128,7 +131,8 @@ func _handle_input() -> void:
 		if dir.length() < 0.2:
 			dir = Vector2.ZERO
 	else:
-		dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+		# WASD（move_*）+ カーソルキー（ui_*）の両方を受け付ける
+		dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	velocity = dir * SPEED_BASE * speed_mult
 	move_and_slide()
 
