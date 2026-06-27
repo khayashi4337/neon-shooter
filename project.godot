@@ -16,6 +16,7 @@ config/features=PackedStringArray("4.6", "Forward Plus")
 
 [autoload]
 
+GameConfig="*res://scripts/GameConfig.gd"
 Network="*res://scripts/Network.gd"
 AudioManager="*res://scripts/AudioManager.gd"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"

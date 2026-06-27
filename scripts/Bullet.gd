@@ -1,7 +1,5 @@
 extends Area2D
 
-const SPEED = 520.0
-
 var direction: Vector2 = Vector2.RIGHT
 var owner_id: int = 1
 var can_pierce: bool = false
@@ -45,7 +43,7 @@ func _setup_visuals() -> void:
 	_col.shape = shape
 
 func _physics_process(delta: float) -> void:
-	global_position += direction * SPEED * delta
+	global_position += direction * GameConfig.bullet_speed * delta
 
 func _on_body_entered(body: Node) -> void:
 	if body == self:

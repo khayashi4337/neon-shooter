@@ -1,14 +1,14 @@
 extends CharacterBody2D
 
-const SPEED_BASE = 210.0
-const FIRE_RATE_BASE = 0.28
 const BULLET_SCENE = preload("res://scenes/Bullet.tscn")
+var SPEED_BASE: float
+var FIRE_RATE_BASE: float
 
 @export var player_id: int = 1
 @export var player_color: Color = Color.CYAN
 
-var hp: int = 100
-var max_hp: int = 100
+var hp: int
+var max_hp: int
 var fire_cd: float = 0.0
 var speed_mult: float = 1.0
 var fire_rate_mult: float = 1.0
@@ -23,6 +23,10 @@ var is_dead: bool = false
 signal died(player_id: int)
 
 func _ready() -> void:
+	SPEED_BASE     = GameConfig.player_speed
+	FIRE_RATE_BASE = GameConfig.fire_rate
+	hp             = GameConfig.player_hp
+	max_hp         = GameConfig.player_hp
 	set_multiplayer_authority(player_id)
 	_setup_visuals()
 

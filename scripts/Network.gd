@@ -1,6 +1,5 @@
 extends Node
 
-const PORT = 7777
 const MAX_PLAYERS = 2
 
 signal player_connected(id: int)
@@ -21,7 +20,7 @@ func _ready() -> void:
 
 func host() -> bool:
 	var peer = WebSocketMultiplayerPeer.new()
-	var err = peer.create_server(PORT)
+	var err = peer.create_server(GameConfig.port)
 	if err != OK:
 		return false
 	multiplayer.multiplayer_peer = peer
@@ -51,7 +50,7 @@ func start_ngrok() -> void:
 	OS.execute("taskkill", ["/F", "/IM", "ngrok.exe"])
 	await get_tree().create_timer(0.8).timeout
 	# cmd /c start /B でバックグラウンド起動（CREATE_NO_WINDOWでは起動失敗するため）
-	_ngrok_pid = OS.create_process("cmd", ["/c", "start", "/B", "ngrok", "http", str(PORT)])
+	_ngrok_pid = OS.create_process("cmd", ["/c", "start", "/B", "ngrok", "http", str(GameConfig.port)])
 
 func stop_ngrok() -> void:
 	OS.execute("taskkill", ["/F", "/IM", "ngrok.exe"])

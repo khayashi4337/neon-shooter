@@ -1,7 +1,7 @@
 extends Node2D
 
 const PLAYER_SCENE = preload("res://scenes/Player.tscn")
-const WINS_TO_WIN = 3
+var WINS_TO_WIN: int
 const POWERUP_SHOW_DELAY = 1.2
 
 const P1_START = Vector2(260, 360)
@@ -23,6 +23,7 @@ var _round_active: bool = false
 @onready var _center_msg: Label = $UI/CenterMsg
 
 func _ready() -> void:
+	WINS_TO_WIN = GameConfig.wins_to_win
 	add_to_group("game")
 	_powerup_menu.chosen.connect(_on_powerup_chosen_local)
 	_center_msg.text = ""

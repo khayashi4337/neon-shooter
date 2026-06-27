@@ -1,8 +1,6 @@
 extends Control
 
 const NGROK_API = "http://localhost:4040/api/tunnels"
-const NGROK_POLL_INTERVAL = 1.0
-const NGROK_MAX_RETRIES = 20
 
 @onready var _host_btn: Button = $Panel/VBox/HostBtn
 @onready var _join_btn: Button = $Panel/VBox/JoinBtn
@@ -33,7 +31,7 @@ func _ready() -> void:
 	_http.request_completed.connect(_on_ngrok_response)
 
 	_poll_timer = Timer.new()
-	_poll_timer.wait_time = NGROK_POLL_INTERVAL
+	_poll_timer.wait_time = GameConfig.ngrok_poll_interval
 	_poll_timer.one_shot = false
 	_poll_timer.timeout.connect(_fetch_ngrok_url)
 	add_child(_poll_timer)
@@ -70,14 +68,14 @@ func _on_host() -> void:
 	# ② 使えなかった → 全プロセス終了して新規起動
 	_status.text = "ngrokをリセット中..."
 	await Network.start_ngrok()
-	await get_tree().create_timer(5.0).timeout
+	await get_tree().create_timer(GameConfig.ngrok_startup_wait).timeout
 	_status.text = "ngrok URL取得中..."
 	_poll_timer.start()
 
 func _fetch_ngrok_url() -> void:
 	if _http_pending:
 		return
-	if _ngrok_retries >= NGROK_MAX_RETRIES:
+	if _ngrok_retries >= GameConfig.ngrok_max_retries:
 		_poll_timer.stop()
 		_status.text = "ngrok URLの取得に失敗しました\n手動でURLを確認してください（localhost:4040）"
 		return

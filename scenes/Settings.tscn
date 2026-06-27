@@ -1,0 +1,202 @@
+[gd_scene format=3 uid="uid://settings01"]
+
+[ext_resource type="Script" path="res://scripts/Settings.gd" id="1"]
+
+[node name="Settings" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.02, 0.06, 1)
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -320.0
+offset_right = 280.0
+offset_bottom = 320.0
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = -20.0
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="Panel/VBox"]
+text = "設定"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(0.0, 1.0, 1.0, 1.0)
+
+[node name="Sep0" type="HSeparator" parent="Panel/VBox"]
+
+[node name="NetLabel" type="Label" parent="Panel/VBox"]
+text = "── ネットワーク ──"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.6, 0.6, 1.0, 1.0)
+
+[node name="PortRow" type="HBoxContainer" parent="Panel/VBox"]
+theme_override_constants/separation = 12
+
+[node name="PortLabel" type="Label" parent="Panel/VBox/PortRow"]
+custom_minimum_size = Vector2(160, 0)
+text = "ポート番号"
+theme_override_font_sizes/font_size = 16
+size_flags_horizontal = 3
+
+[node name="PortSpin" type="SpinBox" parent="Panel/VBox/PortRow"]
+custom_minimum_size = Vector2(120, 0)
+min_value = 1024.0
+max_value = 65535.0
+step = 1.0
+value = 7777.0
+theme_override_font_sizes/font_size = 16
+
+[node name="Sep1" type="HSeparator" parent="Panel/VBox"]
+
+[node name="GameLabel" type="Label" parent="Panel/VBox"]
+text = "── ゲーム ──"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.6, 0.6, 1.0, 1.0)
+
+[node name="WinsRow" type="HBoxContainer" parent="Panel/VBox"]
+theme_override_constants/separation = 12
+
+[node name="WinsLabel" type="Label" parent="Panel/VBox/WinsRow"]
+custom_minimum_size = Vector2(160, 0)
+text = "先取ラウンド数"
+theme_override_font_sizes/font_size = 16
+size_flags_horizontal = 3
+
+[node name="WinsSpin" type="SpinBox" parent="Panel/VBox/WinsRow"]
+custom_minimum_size = Vector2(120, 0)
+min_value = 1.0
+max_value = 10.0
+step = 1.0
+value = 3.0
+theme_override_font_sizes/font_size = 16
+
+[node name="HPRow" type="HBoxContainer" parent="Panel/VBox"]
+theme_override_constants/separation = 12
+
+[node name="HPLabel" type="Label" parent="Panel/VBox/HPRow"]
+custom_minimum_size = Vector2(160, 0)
+text = "初期HP"
+theme_override_font_sizes/font_size = 16
+size_flags_horizontal = 3
+
+[node name="HPSpin" type="SpinBox" parent="Panel/VBox/HPRow"]
+custom_minimum_size = Vector2(120, 0)
+min_value = 10.0
+max_value = 500.0
+step = 10.0
+value = 100.0
+theme_override_font_sizes/font_size = 16
+
+[node name="SpeedRow" type="HBoxContainer" parent="Panel/VBox"]
+theme_override_constants/separation = 12
+
+[node name="SpeedLabel" type="Label" parent="Panel/VBox/SpeedRow"]
+custom_minimum_size = Vector2(160, 0)
+text = "移動速度"
+theme_override_font_sizes/font_size = 16
+size_flags_horizontal = 3
+
+[node name="SpeedSpin" type="SpinBox" parent="Panel/VBox/SpeedRow"]
+custom_minimum_size = Vector2(120, 0)
+min_value = 50.0
+max_value = 600.0
+step = 10.0
+value = 210.0
+theme_override_font_sizes/font_size = 16
+
+[node name="BulletRow" type="HBoxContainer" parent="Panel/VBox"]
+theme_override_constants/separation = 12
+
+[node name="BulletLabel" type="Label" parent="Panel/VBox/BulletRow"]
+custom_minimum_size = Vector2(160, 0)
+text = "弾速度"
+theme_override_font_sizes/font_size = 16
+size_flags_horizontal = 3
+
+[node name="BulletSpin" type="SpinBox" parent="Panel/VBox/BulletRow"]
+custom_minimum_size = Vector2(120, 0)
+min_value = 100.0
+max_value = 1500.0
+step = 10.0
+value = 520.0
+theme_override_font_sizes/font_size = 16
+
+[node name="Sep2" type="HSeparator" parent="Panel/VBox"]
+
+[node name="AudioLabel" type="Label" parent="Panel/VBox"]
+text = "── 音量 ──"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.6, 0.6, 1.0, 1.0)
+
+[node name="VolumeRow" type="HBoxContainer" parent="Panel/VBox"]
+theme_override_constants/separation = 12
+
+[node name="VolumeLabel" type="Label" parent="Panel/VBox/VolumeRow"]
+custom_minimum_size = Vector2(80, 0)
+text = "音量"
+theme_override_font_sizes/font_size = 16
+
+[node name="VolumeSlider" type="HSlider" parent="Panel/VBox/VolumeRow"]
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 28)
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 0.8
+
+[node name="VolumeVal" type="Label" parent="Panel/VBox/VolumeRow"]
+custom_minimum_size = Vector2(40, 0)
+text = "80%"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1.0)
+
+[node name="Sep3" type="HSeparator" parent="Panel/VBox"]
+
+[node name="BtnRow" type="HBoxContainer" parent="Panel/VBox"]
+theme_override_constants/separation = 10
+
+[node name="SaveBtn" type="Button" parent="Panel/VBox/BtnRow"]
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 44)
+text = "保存"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.0, 1.0, 1.0, 1.0)
+
+[node name="ResetBtn" type="Button" parent="Panel/VBox/BtnRow"]
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 44)
+text = "デフォルト"
+theme_override_font_sizes/font_size = 16
+
+[node name="BackBtn" type="Button" parent="Panel/VBox/BtnRow"]
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 44)
+text = "← 戻る"
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1.0)
