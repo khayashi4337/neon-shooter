@@ -1,7 +1,6 @@
 extends Node2D
 
 const PLAYER_SCENE = preload("res://scenes/Player.tscn")
-var WINS_TO_WIN: int
 const POWERUP_SHOW_DELAY = 1.2
 
 const P1_START = Vector2(260, 360)
@@ -24,7 +23,6 @@ var _round_active: bool = false
 @onready var _center_msg: Label = $UI/CenterMsg
 
 func _ready() -> void:
-	WINS_TO_WIN = GameConfig.wins_to_win
 	add_to_group("game")
 	_powerup_menu.chosen.connect(_on_powerup_chosen_local)
 	_pause_menu.resume_pressed.connect(_on_resume)
@@ -234,7 +232,7 @@ func _next_round() -> void:
 
 func _check_game_over() -> bool:
 	for pid in _wins:
-		if _wins[pid] >= WINS_TO_WIN:
+		if _wins[pid] >= GameConfig.wins_to_win:
 			var my_id = multiplayer.get_unique_id()
 			if pid == my_id:
 				_center_msg.text = "VICTORY!"
