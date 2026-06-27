@@ -2,7 +2,7 @@ extends Control
 
 const NGROK_API = "http://localhost:4040/api/tunnels"
 const NGROK_POLL_INTERVAL = 1.0
-const NGROK_MAX_RETRIES = 15
+const NGROK_MAX_RETRIES = 20
 
 @onready var _host_btn: Button = $Panel/VBox/HostBtn
 @onready var _join_btn: Button = $Panel/VBox/JoinBtn
@@ -13,6 +13,7 @@ const NGROK_MAX_RETRIES = 15
 @onready var _copy_btn: Button = $Panel/VBox/URLRow/CopyBtn
 
 var _http: HTTPRequest
+var _http_pending: bool = false
 var _ngrok_retries: int = 0
 var _poll_timer: Timer
 
@@ -58,19 +59,24 @@ func _on_host() -> void:
 	# ② 使えなかった → 全プロセス終了して新規起動
 	_status.text = "ngrokをリセット中..."
 	await Network.start_ngrok()
-	await get_tree().create_timer(2.0).timeout
+	# ngrokがトンネルを確立するまで5秒待ってからポーリング開始
+	await get_tree().create_timer(5.0).timeout
+	_status.text = "ngrok URL取得中..."
 	_poll_timer.start()
 
 func _fetch_ngrok_url() -> void:
+	if _http_pending:
+		return
 	if _ngrok_retries >= NGROK_MAX_RETRIES:
 		_poll_timer.stop()
 		_status.text = "ngrok URLの取得に失敗しました\n手動でURLを確認してください（localhost:4040）"
 		return
 	_ngrok_retries += 1
-	if _http.get_http_client_status() == HTTPClient.STATUS_DISCONNECTED:
-		_http.request(NGROK_API)
+	_http_pending = true
+	_http.request(NGROK_API)
 
 func _on_ngrok_response(result: int, _code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	_http_pending = false
 	if result != HTTPRequest.RESULT_SUCCESS:
 		return
 	var json = JSON.new()

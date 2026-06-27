@@ -49,7 +49,8 @@ func start_ngrok() -> void:
 	# 既存のngrokプロセスを全終了してから新規起動
 	OS.execute("taskkill", ["/F", "/IM", "ngrok.exe"])
 	await get_tree().create_timer(0.8).timeout
-	_ngrok_pid = OS.create_process("ngrok", ["http", str(PORT)])
+	# cmd /c start /B でバックグラウンド起動（CREATE_NO_WINDOWでは起動失敗するため）
+	_ngrok_pid = OS.create_process("cmd", ["/c", "start", "/B", "ngrok", "http", str(PORT)])
 
 func stop_ngrok() -> void:
 	OS.execute("taskkill", ["/F", "/IM", "ngrok.exe"])
