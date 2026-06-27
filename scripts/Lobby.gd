@@ -21,6 +21,7 @@ func _ready() -> void:
 	_host_btn.pressed.connect(_on_host)
 	_join_btn.pressed.connect(_on_join)
 	_copy_btn.pressed.connect(_on_copy)
+	$Panel/VBox/BackBtn.pressed.connect(_on_back)
 	Network.player_connected.connect(_on_player_connected)
 	Network.connection_failed.connect(_on_connection_failed)
 	Network.server_disconnected.connect(_on_server_disconnected)
@@ -37,6 +38,12 @@ func _ready() -> void:
 	_poll_timer.timeout.connect(_fetch_ngrok_url)
 	add_child(_poll_timer)
 
+	# モードに応じて初期UIを設定
+	if Network.game_mode == "local":
+		$Panel/VBox/Title.text = "ローカル対戦"
+		$Panel/VBox/IPRow/IPInput.text = "ws://127.0.0.1:7777"
+		$Panel/VBox/IPRow/IPInput.placeholder_text = "ws://127.0.0.1:7777"
+
 func _on_host() -> void:
 	if not Network.host():
 		_status.text = "サーバー起動失敗"
@@ -46,6 +53,11 @@ func _on_host() -> void:
 	_join_btn.disabled = true
 	_ngrok_retries = 0
 
+	if Network.game_mode == "local":
+		_show_ngrok_url("ws://127.0.0.1:7777")
+		_status.text = "ローカルサーバー起動中\n同じPCまたはLAN内から接続可能"
+		return
+
 	# ① 既存のngrokトンネルが生きているか確認
 	_status.text = "既存のngrokトンネルを確認中..."
 	if _http.get_http_client_status() == HTTPClient.STATUS_DISCONNECTED:
@@ -53,13 +65,11 @@ func _on_host() -> void:
 	await get_tree().create_timer(1.2).timeout
 
 	if _url_row.visible:
-		# 既存トンネルが使えた
 		return
 
 	# ② 使えなかった → 全プロセス終了して新規起動
 	_status.text = "ngrokをリセット中..."
 	await Network.start_ngrok()
-	# ngrokがトンネルを確立するまで5秒待ってからポーリング開始
 	await get_tree().create_timer(5.0).timeout
 	_status.text = "ngrok URL取得中..."
 	_poll_timer.start()
@@ -132,3 +142,10 @@ func _on_server_disconnected() -> void:
 	_status.text = "サーバーが切断されました"
 	_host_btn.disabled = false
 	_join_btn.disabled = false
+
+func _on_back() -> void:
+	_poll_timer.stop()
+	Network.stop_ngrok()
+	multiplayer.multiplayer_peer = null
+	Network.players.clear()
+	get_tree().change_scene_to_file("res://scenes/Title.tscn")

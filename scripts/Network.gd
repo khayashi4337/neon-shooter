@@ -9,6 +9,7 @@ signal connection_failed
 signal server_disconnected
 
 var players: Dictionary = {}
+var game_mode: String = "internet"
 var _ngrok_pid: int = -1
 
 func _ready() -> void:

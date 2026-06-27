@@ -87,3 +87,9 @@ horizontal_alignment = 1
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 15
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1.0)
+
+[node name="BackBtn" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 40)
+text = "← タイトルに戻る"
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1.0)

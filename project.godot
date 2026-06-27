@@ -11,13 +11,14 @@ config_version=5
 [application]
 
 config/name="Neon Shooter"
-run/main_scene="res://scenes/Lobby.tscn"
+run/main_scene="res://scenes/Title.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 
 [autoload]
 
 Network="*res://scripts/Network.gd"
 AudioManager="*res://scripts/AudioManager.gd"
+_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [display]
 
@@ -36,3 +37,12 @@ shoot={
 "events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":0,"position":Vector2(0, 0),"global_position":Vector2(0, 0),"factor":1.0,"button_index":1,"canceled":false,"pressed":false,"double_click":false,"script":null)
 ]
 }
+
+[plugins]
+
+ai_assistant_hub/options/debug_mode=0
+ai_assistant_hub/llm_api="ollama_api"
+ai_assistant_hub/preferences/thinking_target=0
+ai_assistant_hub/preferences/skip_greeting=false
+ai_assistant_hub/preferences/always_scroll_to_bottom=false
+ai_assistant_hub/preferences/audio_hints=true
