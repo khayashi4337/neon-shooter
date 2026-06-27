@@ -72,7 +72,8 @@ func _create_environment() -> void:
 	env.glow_bloom = 0.35
 	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_ADDITIVE
 	env.glow_hdr_threshold = 0.7
-	env.glow_levels = 7
+	for i in range(1, 8):
+		env.set_glow_level(i, 1.0)
 	world_env.environment = env
 	add_child(world_env)
 
