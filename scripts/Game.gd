@@ -12,6 +12,7 @@ var _players: Dictionary = {}
 var _wins: Dictionary = {}
 var _current_round: int = 1
 var _round_active: bool = false
+var _game_over: bool = false
 
 @onready var _players_node: Node2D = $PlayersNode
 @onready var _bullets_node: Node2D = $BulletsNode
@@ -33,6 +34,12 @@ func _ready() -> void:
 	_setup_players.call_deferred()
 
 func _input(event: InputEvent) -> void:
+	if _game_over:
+		if event.is_action_pressed("ui_accept"):
+			_restart_game()
+		elif event.is_action_pressed("ui_cancel"):
+			_on_quit_to_title()
+		return
 	if event.is_action_pressed("ui_cancel"):
 		_toggle_pause()
 
@@ -170,6 +177,7 @@ func _on_player_died(dead_id: int) -> void:
 	_show_round_result(winner_id)
 
 	if _check_game_over():
+		_enter_game_over()
 		return
 
 	await get_tree().create_timer(POWERUP_SHOW_DELAY).timeout
@@ -242,6 +250,28 @@ func _check_game_over() -> bool:
 				_center_msg.modulate = Color(0.5, 0.5, 0.5)
 			return true
 	return false
+
+func _enter_game_over() -> void:
+	_game_over = true
+	await get_tree().create_timer(2.0).timeout
+	_center_msg.text += "\n[Enter] もう一度  [Esc] タイトルへ"
+	_center_msg.modulate = Color.WHITE
+
+func _restart_game() -> void:
+	var ids = Network.get_sorted_ids()
+	if ids.size() < 2:
+		return
+	_game_over = false
+	_current_round = 1
+	for pid in ids:
+		_wins[pid] = 0
+	_update_score_ui()
+	for b in _bullets_node.get_children():
+		b.queue_free()
+	_players[ids[0]].reset_for_new_game(P1_START)
+	_players[ids[1]].reset_for_new_game(P2_START)
+	_center_msg.text = ""
+	_start_round_countdown()
 
 func _update_score_ui() -> void:
 	var ids = Network.get_sorted_ids()
