@@ -57,37 +57,35 @@ func _on_host() -> void:
 	if not Network.host():
 		_status.text = "サーバー起動失敗"
 		return
-
 	_host_btn.disabled = true
 	_join_btn.disabled = true
 	_ngrok_retries = 0
+	match Network.game_mode:
+		"local":    _host_local()
+		"samepc":   _host_samepc()
+		_:          await _host_internet()
 
-	if Network.game_mode == "local":
-		var lan_ip = _get_local_ip()
-		var local_url = "ws://" + lan_ip + ":" + str(GameConfig.port)
-		_show_ngrok_url(local_url)
-		_status.text = "LAN サーバー起動中\nこのURLを同じLAN内の相手に送ってください"
-		return
+func _host_local() -> void:
+	var lan_ip = _get_local_ip()
+	_show_ngrok_url("ws://" + lan_ip + ":" + str(GameConfig.port))
+	_status.text = "LAN サーバー起動中\nこのURLを同じLAN内の相手に送ってください"
 
-	if Network.game_mode == "samepc":
-		_show_ngrok_url("ws://127.0.0.1:" + str(GameConfig.port))
-		_status.text = "2つ目のウィンドウを起動中..."
-		# 同じGodot実行ファイルを --join フラグ付きで起動
-		var exe = OS.get_executable_path()
-		var project = ProjectSettings.globalize_path("res://")
-		OS.create_process(exe, ["--path", project, "--", "--join"])
-		_status.text = "相手ウィンドウの接続を待っています..."
-		return
+func _host_samepc() -> void:
+	_show_ngrok_url("ws://127.0.0.1:" + str(GameConfig.port))
+	_status.text = "2つ目のウィンドウを起動中..."
+	var exe = OS.get_executable_path()
+	var project = ProjectSettings.globalize_path("res://")
+	OS.create_process(exe, ["--path", project, "--", "--join"])
+	_status.text = "相手ウィンドウの接続を待っています..."
 
+func _host_internet() -> void:
 	# ① 既存のngrokトンネルが生きているか確認
 	_status.text = "既存のngrokトンネルを確認中..."
 	if _http.get_http_client_status() == HTTPClient.STATUS_DISCONNECTED:
 		_http.request(NGROK_API)
 	await get_tree().create_timer(1.2).timeout
-
 	if _url_row.visible:
 		return
-
 	# ② 使えなかった → 全プロセス終了して新規起動
 	_status.text = "ngrokをリセット中..."
 	await Network.start_ngrok()
