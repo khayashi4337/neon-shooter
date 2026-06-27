@@ -25,14 +25,22 @@ const PAD_TRIGGER_THRESHOLD: float = 0.5
 const BULLET_DAMAGE: int = 20
 
 # --- CPU AI 定数 ---
-const CPU_IDEAL_DIST:         float = 260.0
-const CPU_DIST_MARGIN:        float = 80.0
-const CPU_SPEED_RATIO:        float = 0.82
-const CPU_FIRE_RANGE:         float = 450.0
+const CPU_IDEAL_DIST:          float = 260.0
+const CPU_DIST_MARGIN:         float = 80.0
+const CPU_SPEED_RATIO:         float = 0.82
+const CPU_FIRE_RANGE:          float = 450.0
 const CPU_JITTER_INTERVAL_MIN: float = 1.2
 const CPU_JITTER_INTERVAL_MAX: float = 2.8
 const CPU_JITTER_AMP:          float = 0.4
 const CPU_ORBIT_FLIP_CHANCE:   float = 0.25
+
+# --- CPU AI 戦術定数 ---
+const CPU_EVADE_LATERAL:       float = 70.0   # 射線上とみなす横幅（px）
+const CPU_PIERCE_IDEAL_DIST:   float = 380.0  # PIERCE：遠距離ポジション
+const CPU_PIERCE_FIRE_RANGE:   float = 600.0  # PIERCE：射程延長
+const CPU_SPEED_IDEAL_DIST:    float = 200.0  # SPEED：側面接近
+const CPU_RAPID_IDEAL_DIST:    float = 160.0  # RAPID：弾幕接近
+const CPU_ARMOR_IDEAL_DIST:    float = 100.0  # ARMOR：正面突進
 
 var SPEED_BASE: float
 var FIRE_RATE_BASE: float
@@ -232,11 +240,43 @@ func _handle_cpu(delta: float) -> void:
 		if randf() < CPU_ORBIT_FLIP_CHANCE:
 			_cpu_orbit_dir *= -1.0
 
-	# 移動：理想距離を保ちながら周回
+	# --- パワーアップ別の理想距離と戦術フラグ ---
+	var ideal_dist: float = CPU_IDEAL_DIST
+	var armor_mode: bool  = false
+	var fire_range: float = CPU_FIRE_RANGE
+	if can_pierce:
+		# PIERCE：遠距離から壁越し射撃 → 射程延長・遠距離ポジション
+		ideal_dist = CPU_PIERCE_IDEAL_DIST
+		fire_range = CPU_PIERCE_FIRE_RANGE
+	elif max_hp > GameConfig.player_hp:
+		# ARMOR：体力で正面突進 → 射線回避しない
+		ideal_dist = CPU_ARMOR_IDEAL_DIST
+		armor_mode = true
+	elif fire_rate_mult > 1.0:
+		# RAPID：接近して弾幕を張る
+		ideal_dist = CPU_RAPID_IDEAL_DIST
+	elif speed_mult > 1.0:
+		# SPEED：素早く側面に回り込む
+		ideal_dist = CPU_SPEED_IDEAL_DIST
+
+	# --- 射線回避（プレイヤーの照準を読んで横にステップ） ---
+	# ARMORは体力で押し切るため回避しない
+	var aim_dir       = Vector2.from_angle(_cpu_target.rotation)
+	var to_cpu_rel    = global_position - _cpu_target.global_position
+	var cross_val     = aim_dir.cross(to_cpu_rel)
+	var on_aim_line   = (not armor_mode
+	                     and abs(cross_val) < CPU_EVADE_LATERAL
+	                     and aim_dir.dot(to_cpu_rel) > 0.0)
+
+	# --- 移動 ---
 	var dir: Vector2
-	if dist > CPU_IDEAL_DIST + CPU_DIST_MARGIN:
+	if on_aim_line:
+		# 射線上 → 横にステップして回避
+		var side = sign(cross_val) if cross_val != 0.0 else _cpu_orbit_dir
+		dir = aim_dir.rotated(PI * 0.5 * side)
+	elif dist > ideal_dist + CPU_DIST_MARGIN:
 		dir = to_target.normalized()
-	elif dist < CPU_IDEAL_DIST - CPU_DIST_MARGIN:
+	elif dist < ideal_dist - CPU_DIST_MARGIN:
 		dir = -to_target.normalized()
 	else:
 		dir = to_target.normalized().rotated(PI * 0.5 * _cpu_orbit_dir)
@@ -244,8 +284,8 @@ func _handle_cpu(delta: float) -> void:
 	velocity = (dir + _cpu_jitter).normalized() * SPEED_BASE * speed_mult * CPU_SPEED_RATIO
 	move_and_slide()
 
-	# 射撃：射程内で fire_cd が切れたら撃つ
-	if dist < CPU_FIRE_RANGE and fire_cd <= 0.0:
+	# --- 射撃：パワーアップ別の射程内で撃つ ---
+	if dist < fire_range and fire_cd <= 0.0:
 		fire_cd = FIRE_RATE_BASE / fire_rate_mult
 		_rpc_fire.rpc(global_position, rotation)
 
