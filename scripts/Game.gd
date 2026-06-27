@@ -8,11 +8,27 @@ const P2_START = Vector2(1020, 360)
 const P1_COLOR = Color(0.0, 1.0, 1.0)
 const P2_COLOR = Color(1.0, 0.0, 1.0)
 
+const PW_ICON_COLORS = {
+	"SPEED":   Color(1.0, 0.9,  0.0),
+	"RAPID":   Color(1.0, 0.7,  0.1),
+	"ARMOR":   Color(0.0, 0.85, 1.0),
+	"PIERCE":  Color(0.9, 0.9,  0.0),
+	"BOUNCE":  Color(0.0, 1.0,  0.5),
+	"SHOTGUN": Color(1.0, 0.5,  0.0),
+	"SHIELD":  Color(0.5, 0.5,  1.0),
+	"REFLECT": Color(0.8, 0.2,  1.0),
+}
+const PW_ICON_LABELS = {
+	"SPEED": "SPD", "RAPID":   "RPC", "ARMOR":   "ARM", "PIERCE":  "PRC",
+	"BOUNCE": "BNC","SHOTGUN": "SHG", "SHIELD":  "SLD", "REFLECT": "RFL",
+}
+
 var _players: Dictionary = {}
 var _wins: Dictionary = {}
 var _current_round: int = 1
 var _round_active: bool = false
 var _game_over: bool = false
+var _pw_icon_boxes: Dictionary = {}
 
 @onready var _players_node: Node2D = $PlayersNode
 @onready var _bullets_node: Node2D = $BulletsNode
@@ -134,6 +150,10 @@ func _setup_players() -> void:
 	_spawn_player(id0, P1_COLOR, P1_START)
 	_spawn_player(id1, P2_COLOR, P2_START)
 
+	_pw_icon_boxes[id0] = _make_icon_box(Vector2(20,  70))
+	_pw_icon_boxes[id1] = _make_icon_box(Vector2(870, 70))
+
+
 	_update_score_ui()
 	_start_round_countdown()
 
@@ -224,6 +244,8 @@ func _on_powerup_chosen_local(loser_id: int, pw: String) -> void:
 func _rpc_apply_powerup(loser_id: int, pw: String) -> void:
 	if _players.has(loser_id):
 		_players[loser_id].apply_powerup(pw)
+	if _pw_icon_boxes.has(loser_id):
+		_add_powerup_icon(_pw_icon_boxes[loser_id], pw)
 	_powerup_menu.hide_menu()
 	AudioManager.play_powerup()
 	await get_tree().create_timer(0.5).timeout
@@ -265,6 +287,9 @@ func _restart_game() -> void:
 	_current_round = 1
 	for pid in ids:
 		_wins[pid] = 0
+		if _pw_icon_boxes.has(pid):
+			for child in _pw_icon_boxes[pid].get_children():
+				child.queue_free()
 	_update_score_ui()
 	for b in _bullets_node.get_children():
 		b.queue_free()
@@ -279,3 +304,39 @@ func _update_score_ui() -> void:
 		return
 	_p1_score.text = str(_wins.get(ids[0], 0))
 	_p2_score.text = str(_wins.get(ids[1], 0))
+
+# --- パワーアップアイコンUI ---
+
+func _make_icon_box(pos: Vector2) -> HBoxContainer:
+	var box = HBoxContainer.new()
+	box.position = pos
+	box.add_theme_constant_override("separation", 4)
+	$UI.add_child(box)
+	return box
+
+func _add_powerup_icon(box: HBoxContainer, pw: String) -> void:
+	var col = PW_ICON_COLORS.get(pw, Color.WHITE)
+	var lbl = PW_ICON_LABELS.get(pw, pw.left(3))
+
+	var panel = Panel.new()
+	panel.custom_minimum_size = Vector2(44, 28)
+
+	var style = StyleBoxFlat.new()
+	style.bg_color        = Color(col.r * 0.12, col.g * 0.12, col.b * 0.12, 0.85)
+	style.border_color    = col
+	style.border_width_left = 2; style.border_width_right  = 2
+	style.border_width_top  = 2; style.border_width_bottom = 2
+	style.corner_radius_top_left    = 3; style.corner_radius_top_right    = 3
+	style.corner_radius_bottom_left = 3; style.corner_radius_bottom_right = 3
+	panel.add_theme_stylebox_override("panel", style)
+
+	var label = Label.new()
+	label.text = lbl
+	label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment   = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 11)
+	label.add_theme_color_override("font_color", col)
+	panel.add_child(label)
+
+	box.add_child(panel)
