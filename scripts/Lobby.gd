@@ -38,12 +38,16 @@ func _ready() -> void:
 
 func _on_host() -> void:
 	if Network.host():
-		_status.text = "サーバー起動中... ngrok接続待ち"
+		_status.text = "サーバー起動中... ngrok確認中"
 		_host_btn.disabled = true
 		_join_btn.disabled = true
-		# ngrokを起動してURLを取得
-		Network.start_ngrok()
 		_ngrok_retries = 0
+		# まず既存トンネルを確認、なければngrokを起動
+		_http.request(NGROK_API)
+		await get_tree().create_timer(1.0).timeout
+		if _url_row.visible:
+			return  # 既存トンネルが見つかった
+		Network.start_ngrok()
 		await get_tree().create_timer(1.5).timeout
 		_poll_timer.start()
 	else:
