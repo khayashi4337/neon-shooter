@@ -8,10 +8,13 @@ const DESCRIPTIONS = {
 	"PIERCE": "弾が壁を貫通",
 }
 const PW_COLORS = {
-	"SPEED": Color(1.0, 1.0, 0.0),
-	"RAPID": Color(1.0, 0.4, 0.0),
-	"ARMOR": Color(0.2, 1.0, 0.2),
-	"PIERCE": Color(1.0, 0.2, 1.0),
+	"SPEED":  Color(1.0, 0.9, 0.0),   # 黄（攻撃系）
+	"RAPID":  Color(1.0, 0.85, 0.1),  # 黄（攻撃系）
+	"ARMOR":  Color(0.0, 0.85, 1.0),  # 水色（防御系）
+	"PIERCE": Color(1.0, 0.95, 0.0),  # 黄（攻撃系）
+}
+const PW_TYPES = {
+	"SPEED": "atk", "RAPID": "atk", "ARMOR": "def", "PIERCE": "atk"
 }
 
 var _loser_id: int = -1
@@ -30,10 +33,18 @@ func _build_buttons() -> void:
 	for pw in POWERUPS:
 		var btn = Button.new()
 		btn.custom_minimum_size = Vector2(200, 100)
-		btn.text = pw + "\n" + DESCRIPTIONS[pw]
+		var type_label = "[攻撃]" if PW_TYPES[pw] == "atk" else "[防御]"
+		btn.text = type_label + " " + pw + "\n" + DESCRIPTIONS[pw]
 		btn.add_theme_color_override("font_color", PW_COLORS[pw])
 		btn.add_theme_color_override("font_hover_color", Color.WHITE)
 		btn.add_theme_font_size_override("font_size", 18)
+		# 背景色を薄く着色
+		var bg = StyleBoxFlat.new()
+		bg.bg_color = PW_COLORS[pw] * 0.15
+		bg.border_width_left = 2; bg.border_width_right = 2
+		bg.border_width_top = 2;  bg.border_width_bottom = 2
+		bg.border_color = PW_COLORS[pw] * 0.6
+		btn.add_theme_stylebox_override("normal", bg)
 		var p = pw
 		btn.pressed.connect(func(): _on_chosen(p))
 		_btn_container.add_child(btn)

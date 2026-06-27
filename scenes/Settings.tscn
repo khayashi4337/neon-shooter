@@ -23,146 +23,151 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -280.0
-offset_top = -320.0
-offset_right = 280.0
-offset_bottom = 320.0
+offset_left = -290.0
+offset_top = -330.0
+offset_right = 290.0
+offset_bottom = 330.0
 
-[node name="VBox" type="VBoxContainer" parent="Panel"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = 20.0
-offset_right = -24.0
-offset_bottom = -20.0
-theme_override_constants/separation = 12
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+horizontal_scroll_mode = 0
 
-[node name="TitleLabel" type="Label" parent="Panel/VBox"]
+[node name="VBox" type="VBoxContainer" parent="Panel/ScrollContainer"]
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(540, 0)
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="Panel/ScrollContainer/VBox"]
 text = "設定"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 32
 theme_override_colors/font_color = Color(0.0, 1.0, 1.0, 1.0)
 
-[node name="Sep0" type="HSeparator" parent="Panel/VBox"]
+[node name="Sep0" type="HSeparator" parent="Panel/ScrollContainer/VBox"]
 
-[node name="NetLabel" type="Label" parent="Panel/VBox"]
+[node name="NetLabel" type="Label" parent="Panel/ScrollContainer/VBox"]
 text = "── ネットワーク ──"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.6, 0.6, 1.0, 1.0)
 
-[node name="PortRow" type="HBoxContainer" parent="Panel/VBox"]
+[node name="PortRow" type="HBoxContainer" parent="Panel/ScrollContainer/VBox"]
 theme_override_constants/separation = 12
 
-[node name="PortLabel" type="Label" parent="Panel/VBox/PortRow"]
-custom_minimum_size = Vector2(160, 0)
+[node name="PortLabel" type="Label" parent="Panel/ScrollContainer/VBox/PortRow"]
+custom_minimum_size = Vector2(200, 0)
 text = "ポート番号"
 theme_override_font_sizes/font_size = 16
 size_flags_horizontal = 3
 
-[node name="PortSpin" type="SpinBox" parent="Panel/VBox/PortRow"]
-custom_minimum_size = Vector2(120, 0)
+[node name="PortSpin" type="SpinBox" parent="Panel/ScrollContainer/VBox/PortRow"]
+custom_minimum_size = Vector2(140, 0)
 min_value = 1024.0
 max_value = 65535.0
 step = 1.0
 value = 7777.0
 theme_override_font_sizes/font_size = 16
 
-[node name="Sep1" type="HSeparator" parent="Panel/VBox"]
+[node name="Sep1" type="HSeparator" parent="Panel/ScrollContainer/VBox"]
 
-[node name="GameLabel" type="Label" parent="Panel/VBox"]
+[node name="GameLabel" type="Label" parent="Panel/ScrollContainer/VBox"]
 text = "── ゲーム ──"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.6, 0.6, 1.0, 1.0)
 
-[node name="WinsRow" type="HBoxContainer" parent="Panel/VBox"]
+[node name="WinsRow" type="HBoxContainer" parent="Panel/ScrollContainer/VBox"]
 theme_override_constants/separation = 12
 
-[node name="WinsLabel" type="Label" parent="Panel/VBox/WinsRow"]
-custom_minimum_size = Vector2(160, 0)
+[node name="WinsLabel" type="Label" parent="Panel/ScrollContainer/VBox/WinsRow"]
+custom_minimum_size = Vector2(200, 0)
 text = "先取ラウンド数"
 theme_override_font_sizes/font_size = 16
 size_flags_horizontal = 3
 
-[node name="WinsSpin" type="SpinBox" parent="Panel/VBox/WinsRow"]
-custom_minimum_size = Vector2(120, 0)
+[node name="WinsSpin" type="SpinBox" parent="Panel/ScrollContainer/VBox/WinsRow"]
+custom_minimum_size = Vector2(140, 0)
 min_value = 1.0
 max_value = 10.0
 step = 1.0
 value = 3.0
 theme_override_font_sizes/font_size = 16
 
-[node name="HPRow" type="HBoxContainer" parent="Panel/VBox"]
+[node name="HPRow" type="HBoxContainer" parent="Panel/ScrollContainer/VBox"]
 theme_override_constants/separation = 12
 
-[node name="HPLabel" type="Label" parent="Panel/VBox/HPRow"]
-custom_minimum_size = Vector2(160, 0)
+[node name="HPLabel" type="Label" parent="Panel/ScrollContainer/VBox/HPRow"]
+custom_minimum_size = Vector2(200, 0)
 text = "初期HP"
 theme_override_font_sizes/font_size = 16
 size_flags_horizontal = 3
 
-[node name="HPSpin" type="SpinBox" parent="Panel/VBox/HPRow"]
-custom_minimum_size = Vector2(120, 0)
+[node name="HPSpin" type="SpinBox" parent="Panel/ScrollContainer/VBox/HPRow"]
+custom_minimum_size = Vector2(140, 0)
 min_value = 10.0
 max_value = 500.0
 step = 10.0
 value = 100.0
 theme_override_font_sizes/font_size = 16
 
-[node name="SpeedRow" type="HBoxContainer" parent="Panel/VBox"]
+[node name="SpeedRow" type="HBoxContainer" parent="Panel/ScrollContainer/VBox"]
 theme_override_constants/separation = 12
 
-[node name="SpeedLabel" type="Label" parent="Panel/VBox/SpeedRow"]
-custom_minimum_size = Vector2(160, 0)
+[node name="SpeedLabel" type="Label" parent="Panel/ScrollContainer/VBox/SpeedRow"]
+custom_minimum_size = Vector2(200, 0)
 text = "移動速度"
 theme_override_font_sizes/font_size = 16
 size_flags_horizontal = 3
 
-[node name="SpeedSpin" type="SpinBox" parent="Panel/VBox/SpeedRow"]
-custom_minimum_size = Vector2(120, 0)
+[node name="SpeedSpin" type="SpinBox" parent="Panel/ScrollContainer/VBox/SpeedRow"]
+custom_minimum_size = Vector2(140, 0)
 min_value = 50.0
 max_value = 600.0
 step = 10.0
 value = 210.0
 theme_override_font_sizes/font_size = 16
 
-[node name="BulletRow" type="HBoxContainer" parent="Panel/VBox"]
+[node name="BulletRow" type="HBoxContainer" parent="Panel/ScrollContainer/VBox"]
 theme_override_constants/separation = 12
 
-[node name="BulletLabel" type="Label" parent="Panel/VBox/BulletRow"]
-custom_minimum_size = Vector2(160, 0)
+[node name="BulletLabel" type="Label" parent="Panel/ScrollContainer/VBox/BulletRow"]
+custom_minimum_size = Vector2(200, 0)
 text = "弾速度"
 theme_override_font_sizes/font_size = 16
 size_flags_horizontal = 3
 
-[node name="BulletSpin" type="SpinBox" parent="Panel/VBox/BulletRow"]
-custom_minimum_size = Vector2(120, 0)
+[node name="BulletSpin" type="SpinBox" parent="Panel/ScrollContainer/VBox/BulletRow"]
+custom_minimum_size = Vector2(140, 0)
 min_value = 100.0
 max_value = 1500.0
 step = 10.0
 value = 520.0
 theme_override_font_sizes/font_size = 16
 
-[node name="Sep2" type="HSeparator" parent="Panel/VBox"]
+[node name="Sep2" type="HSeparator" parent="Panel/ScrollContainer/VBox"]
 
-[node name="AudioLabel" type="Label" parent="Panel/VBox"]
+[node name="AudioLabel" type="Label" parent="Panel/ScrollContainer/VBox"]
 text = "── 音量 ──"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.6, 0.6, 1.0, 1.0)
 
-[node name="VolumeRow" type="HBoxContainer" parent="Panel/VBox"]
+[node name="VolumeRow" type="HBoxContainer" parent="Panel/ScrollContainer/VBox"]
 theme_override_constants/separation = 12
 
-[node name="VolumeLabel" type="Label" parent="Panel/VBox/VolumeRow"]
+[node name="VolumeLabel" type="Label" parent="Panel/ScrollContainer/VBox/VolumeRow"]
 custom_minimum_size = Vector2(80, 0)
 text = "音量"
 theme_override_font_sizes/font_size = 16
 
-[node name="VolumeSlider" type="HSlider" parent="Panel/VBox/VolumeRow"]
+[node name="VolumeSlider" type="HSlider" parent="Panel/ScrollContainer/VBox/VolumeRow"]
 size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 28)
 min_value = 0.0
@@ -170,49 +175,90 @@ max_value = 1.0
 step = 0.05
 value = 0.8
 
-[node name="VolumeVal" type="Label" parent="Panel/VBox/VolumeRow"]
-custom_minimum_size = Vector2(40, 0)
+[node name="VolumeVal" type="Label" parent="Panel/ScrollContainer/VBox/VolumeRow"]
+custom_minimum_size = Vector2(44, 0)
 text = "80%"
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1.0)
 
-[node name="Sep3" type="HSeparator" parent="Panel/VBox"]
+[node name="Sep3" type="HSeparator" parent="Panel/ScrollContainer/VBox"]
 
-[node name="KeyLabel" type="Label" parent="Panel/VBox"]
-text = "━━ 操作説明 ━━"
+[node name="DeviceLabel" type="Label" parent="Panel/ScrollContainer/VBox"]
+text = "── 入力デバイス ──"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.6, 0.6, 1.0, 1.0)
 
-[node name="P1KeyHint" type="Label" parent="Panel/VBox"]
-text = "P1(HOST): WASD移動 / マウス照準 / 左クリック射撃"
+[node name="P1DeviceRow" type="HBoxContainer" parent="Panel/ScrollContainer/VBox"]
+theme_override_constants/separation = 12
+
+[node name="P1DeviceLabel" type="Label" parent="Panel/ScrollContainer/VBox/P1DeviceRow"]
+custom_minimum_size = Vector2(200, 0)
+text = "P1 (HOST) デバイス"
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.0, 1.0, 1.0, 0.9)
+size_flags_horizontal = 3
+
+[node name="P1DeviceOpt" type="OptionButton" parent="Panel/ScrollContainer/VBox/P1DeviceRow"]
+custom_minimum_size = Vector2(200, 36)
+theme_override_font_sizes/font_size = 15
+
+[node name="P2DeviceRow" type="HBoxContainer" parent="Panel/ScrollContainer/VBox"]
+theme_override_constants/separation = 12
+
+[node name="P2DeviceLabel" type="Label" parent="Panel/ScrollContainer/VBox/P2DeviceRow"]
+custom_minimum_size = Vector2(200, 0)
+text = "P2 (JOIN) デバイス"
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1.0, 0.2, 1.0, 0.9)
+size_flags_horizontal = 3
+
+[node name="P2DeviceOpt" type="OptionButton" parent="Panel/ScrollContainer/VBox/P2DeviceRow"]
+custom_minimum_size = Vector2(200, 36)
+theme_override_font_sizes/font_size = 15
+
+[node name="Sep4" type="HSeparator" parent="Panel/ScrollContainer/VBox"]
+
+[node name="KeyLabel" type="Label" parent="Panel/ScrollContainer/VBox"]
+text = "━━ 操作説明 ━━"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.6, 0.6, 1.0, 1.0)
+
+[node name="P1KeyHint" type="Label" parent="Panel/ScrollContainer/VBox"]
+text = "P1: WASD移動 / マウス照準 / 左クリック射撃"
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.0, 1.0, 1.0, 0.9)
 
-[node name="P2KeyHint" type="Label" parent="Panel/VBox"]
-text = "P2(JOIN): 矢印キー移動 / マウス照準 / Enterキー射撃"
+[node name="P2KeyHint" type="Label" parent="Panel/ScrollContainer/VBox"]
+text = "P2: 矢印キー移動 / マウス照準 / Enterキー射撃"
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(1.0, 0.2, 1.0, 0.9)
 
-[node name="Sep4" type="HSeparator" parent="Panel/VBox"]
+[node name="PadHint" type="Label" parent="Panel/ScrollContainer/VBox"]
+text = "ゲームパッド: 左スティック移動 / 右スティック照準 / RT or RBで射撃"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.8, 0.8, 0.3, 0.9)
 
-[node name="BtnRow" type="HBoxContainer" parent="Panel/VBox"]
+[node name="Sep5" type="HSeparator" parent="Panel/ScrollContainer/VBox"]
+
+[node name="BtnRow" type="HBoxContainer" parent="Panel/ScrollContainer/VBox"]
 theme_override_constants/separation = 10
 
-[node name="SaveBtn" type="Button" parent="Panel/VBox/BtnRow"]
+[node name="SaveBtn" type="Button" parent="Panel/ScrollContainer/VBox/BtnRow"]
 size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 44)
 text = "保存"
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.0, 1.0, 1.0, 1.0)
 
-[node name="ResetBtn" type="Button" parent="Panel/VBox/BtnRow"]
+[node name="ResetBtn" type="Button" parent="Panel/ScrollContainer/VBox/BtnRow"]
 size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 44)
 text = "デフォルト"
 theme_override_font_sizes/font_size = 16
 
-[node name="BackBtn" type="Button" parent="Panel/VBox/BtnRow"]
+[node name="BackBtn" type="Button" parent="Panel/ScrollContainer/VBox/BtnRow"]
 size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 44)
 text = "← 戻る"

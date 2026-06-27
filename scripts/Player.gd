@@ -66,6 +66,25 @@ func _setup_visuals() -> void:
 	gun.position = Vector2(30, 0)
 	add_child(gun)
 
+	# 目（前方方向に自動追従）
+	var eye_img = Image.create(8, 8, false, Image.FORMAT_RGBA8)
+	for ex in range(8):
+		for ey in range(8):
+			var d = Vector2(ex - 4.0, ey - 4.0).length()
+			if d < 2.5:
+				eye_img.set_pixel(ex, ey, Color(0.05, 0.05, 0.05, 1.0))  # 瞳
+			elif d < 3.8:
+				eye_img.set_pixel(ex, ey, Color(1.0, 1.0, 1.0, 1.0 - (d - 2.5) / 1.5))  # 白目
+	var eye_tex = ImageTexture.create_from_image(eye_img)
+	var eye_l = Sprite2D.new()
+	eye_l.texture = eye_tex
+	eye_l.position = Vector2(11, -7)
+	add_child(eye_l)
+	var eye_r = Sprite2D.new()
+	eye_r.texture = eye_tex
+	eye_r.position = Vector2(11, 7)
+	add_child(eye_r)
+
 	_hp_bar.min_value = 0
 	_hp_bar.max_value = 100
 	_hp_bar.value = 100
@@ -88,13 +107,38 @@ func _physics_process(delta: float) -> void:
 		_rpc_sync.rpc(global_position, rotation)
 
 func _handle_input() -> void:
-	var dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	var use_pad = (GameConfig.p1_device == "gamepad" if player_id == 1 else GameConfig.p2_device == "gamepad")
+	var pad_id  = (GameConfig.p1_gamepad_id if player_id == 1 else GameConfig.p2_gamepad_id)
+
+	# 移動
+	var dir: Vector2
+	if use_pad:
+		dir = Vector2(Input.get_joy_axis(pad_id, JOY_AXIS_LEFT_X),
+		              Input.get_joy_axis(pad_id, JOY_AXIS_LEFT_Y))
+		if dir.length() < 0.2:
+			dir = Vector2.ZERO
+	else:
+		dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	velocity = dir * SPEED_BASE * speed_mult
 	move_and_slide()
-	rotation = (get_global_mouse_position() - global_position).angle()
 
-	var fire_action = "shoot" if player_id == 1 else "shoot_p2"
-	if Input.is_action_pressed(fire_action) and fire_cd <= 0.0:
+	# 照準
+	if use_pad:
+		var aim = Vector2(Input.get_joy_axis(pad_id, JOY_AXIS_RIGHT_X),
+		                  Input.get_joy_axis(pad_id, JOY_AXIS_RIGHT_Y))
+		if aim.length() > 0.2:
+			rotation = aim.angle()
+	else:
+		rotation = (get_global_mouse_position() - global_position).angle()
+
+	# 射撃
+	var firing: bool
+	if use_pad:
+		firing = (Input.get_joy_axis(pad_id, JOY_AXIS_TRIGGER_RIGHT) > 0.5
+		          or Input.is_joy_button_pressed(pad_id, JOY_BUTTON_RIGHT_SHOULDER))
+	else:
+		firing = Input.is_action_pressed("shoot" if player_id == 1 else "shoot_p2")
+	if firing and fire_cd <= 0.0:
 		fire_cd = FIRE_RATE_BASE / fire_rate_mult
 		_rpc_fire.rpc(global_position, rotation)
 
