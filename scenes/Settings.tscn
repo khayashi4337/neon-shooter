@@ -178,6 +178,24 @@ theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1.0)
 
 [node name="Sep3" type="HSeparator" parent="Panel/VBox"]
 
+[node name="KeyLabel" type="Label" parent="Panel/VBox"]
+text = "━━ 操作説明 ━━"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.6, 0.6, 1.0, 1.0)
+
+[node name="P1KeyHint" type="Label" parent="Panel/VBox"]
+text = "P1(HOST): WASD移動 / マウス照準 / 左クリック射撃"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.0, 1.0, 1.0, 0.9)
+
+[node name="P2KeyHint" type="Label" parent="Panel/VBox"]
+text = "P2(JOIN): 矢印キー移動 / マウス照準 / Enterキー射撃"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(1.0, 0.2, 1.0, 0.9)
+
+[node name="Sep4" type="HSeparator" parent="Panel/VBox"]
+
 [node name="BtnRow" type="HBoxContainer" parent="Panel/VBox"]
 theme_override_constants/separation = 10
 

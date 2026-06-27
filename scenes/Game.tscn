@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://gm0001"]
+[gd_scene load_steps=4 format=3 uid="uid://gm0001"]
 
 [ext_resource type="Script" path="res://scripts/Game.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://pw0001" path="res://scenes/PowerupMenu.tscn" id="2"]
+[ext_resource type="Script" path="res://scripts/PauseMenu.gd" id="3"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1")
@@ -60,3 +61,74 @@ text = ""
 horizontal_alignment = 1
 vertical_alignment = 1
 theme_override_font_sizes/font_size = 56
+
+[node name="PauseMenu" type="CanvasLayer" parent="."]
+script = ExtResource("3")
+
+[node name="Overlay" type="ColorRect" parent="PauseMenu"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.0, 0.0, 0.0, 0.6)
+
+[node name="Panel" type="Panel" parent="PauseMenu"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -240.0
+offset_right = 260.0
+offset_bottom = 240.0
+
+[node name="VBox" type="VBoxContainer" parent="PauseMenu/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = -20.0
+theme_override_constants/separation = 12
+
+[node name="PausedLabel" type="Label" parent="PauseMenu/Panel/VBox"]
+text = "PAUSED"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 36
+theme_override_colors/font_color = Color(0.0, 1.0, 1.0, 1.0)
+
+[node name="Sep1" type="HSeparator" parent="PauseMenu/Panel/VBox"]
+
+[node name="HintTitle" type="Label" parent="PauseMenu/Panel/VBox"]
+text = "━━ 操作説明 ━━"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.6, 0.6, 1.0, 1.0)
+
+[node name="P1Hint" type="Label" parent="PauseMenu/Panel/VBox"]
+text = "P1 (HOST)  WASD移動 / マウス照準 / 左クリック射撃"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.0, 1.0, 1.0, 1.0)
+
+[node name="P2Hint" type="Label" parent="PauseMenu/Panel/VBox"]
+text = "P2 (JOIN)  矢印キー移動 / マウス照準 / Enterキー射撃"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(1.0, 0.2, 1.0, 1.0)
+
+[node name="Sep2" type="HSeparator" parent="PauseMenu/Panel/VBox"]
+
+[node name="ResumeBtn" type="Button" parent="PauseMenu/Panel/VBox"]
+custom_minimum_size = Vector2(0, 50)
+text = "再開"
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.0, 1.0, 1.0, 1.0)
+
+[node name="QuitBtn" type="Button" parent="PauseMenu/Panel/VBox"]
+custom_minimum_size = Vector2(0, 50)
+text = "タイトルに戻る"
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1.0)

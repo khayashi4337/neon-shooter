@@ -55,6 +55,17 @@ func _setup_visuals() -> void:
 	cs.radius = 18.0
 	_col.shape = cs
 
+	# 銃口インジケーター（rotation方向に自動追従）
+	var gun_img = Image.create(18, 6, false, Image.FORMAT_RGBA8)
+	for gx in range(18):
+		for gy in range(6):
+			var alpha = lerp(1.0, 0.3, float(gx) / 18.0)
+			gun_img.set_pixel(gx, gy, Color(player_color.r, player_color.g, player_color.b, alpha))
+	var gun = Sprite2D.new()
+	gun.texture = ImageTexture.create_from_image(gun_img)
+	gun.position = Vector2(30, 0)
+	add_child(gun)
+
 	_hp_bar.min_value = 0
 	_hp_bar.max_value = 100
 	_hp_bar.value = 100
@@ -82,7 +93,8 @@ func _handle_input() -> void:
 	move_and_slide()
 	rotation = (get_global_mouse_position() - global_position).angle()
 
-	if Input.is_action_pressed("shoot") and fire_cd <= 0.0:
+	var fire_action = "shoot" if player_id == 1 else "shoot_p2"
+	if Input.is_action_pressed(fire_action) and fire_cd <= 0.0:
 		fire_cd = FIRE_RATE_BASE / fire_rate_mult
 		_rpc_fire.rpc(global_position, rotation)
 

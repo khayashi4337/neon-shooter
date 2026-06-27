@@ -17,6 +17,7 @@ var _round_active: bool = false
 @onready var _players_node: Node2D = $PlayersNode
 @onready var _bullets_node: Node2D = $BulletsNode
 @onready var _powerup_menu: CanvasLayer = $PowerupMenu
+@onready var _pause_menu: CanvasLayer = $PauseMenu
 @onready var _p1_score: Label = $UI/ScoreBar/P1Score
 @onready var _p2_score: Label = $UI/ScoreBar/P2Score
 @onready var _round_label: Label = $UI/RoundLabel
@@ -26,10 +27,34 @@ func _ready() -> void:
 	WINS_TO_WIN = GameConfig.wins_to_win
 	add_to_group("game")
 	_powerup_menu.chosen.connect(_on_powerup_chosen_local)
+	_pause_menu.resume_pressed.connect(_on_resume)
+	_pause_menu.quit_pressed.connect(_on_quit_to_title)
 	_center_msg.text = ""
 	_create_environment()
 	_create_map()
 	_setup_players.call_deferred()
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		_toggle_pause()
+
+func _toggle_pause() -> void:
+	get_tree().paused = !get_tree().paused
+	if get_tree().paused:
+		_pause_menu.show()
+	else:
+		_pause_menu.hide()
+
+func _on_resume() -> void:
+	get_tree().paused = false
+	_pause_menu.hide()
+
+func _on_quit_to_title() -> void:
+	get_tree().paused = false
+	Network.stop_ngrok()
+	multiplayer.multiplayer_peer = null
+	Network.players.clear()
+	get_tree().change_scene_to_file("res://scenes/Title.tscn")
 
 func add_bullet(bullet: Node) -> void:
 	_bullets_node.add_child(bullet)
