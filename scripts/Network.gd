@@ -55,6 +55,13 @@ func start_ngrok() -> void:
 func stop_ngrok() -> void:
 	OS.execute("taskkill", ["/F", "/IM", "ngrok.exe"])
 
+func start_cpu_game() -> void:
+	game_mode = "cpu"
+	players.clear()
+	players[1] = 1
+	players[2] = 2
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+
 func get_sorted_ids() -> Array:
 	var ids = players.keys()
 	ids.sort()

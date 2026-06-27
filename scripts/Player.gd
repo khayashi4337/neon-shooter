@@ -15,6 +15,12 @@ var fire_rate_mult: float = 1.0
 var can_pierce: bool = false
 var is_dead: bool = false
 
+var is_cpu: bool = false
+var _cpu_target: Node2D = null
+var _cpu_orbit_dir: float = 1.0
+var _cpu_jitter_timer: float = 0.0
+var _cpu_jitter: Vector2 = Vector2.ZERO
+
 @onready var _sprite: Sprite2D = $Sprite2D
 @onready var _light: PointLight2D = $PointLight2D
 @onready var _col: CollisionShape2D = $CollisionShape2D
@@ -102,7 +108,11 @@ func _physics_process(delta: float) -> void:
 	if is_dead:
 		return
 	fire_cd -= delta
-	if is_multiplayer_authority():
+	if is_cpu:
+		if is_multiplayer_authority():
+			_handle_cpu(delta)
+			_rpc_sync.rpc(global_position, rotation)
+	elif is_multiplayer_authority():
 		_handle_input()
 		_rpc_sync.rpc(global_position, rotation)
 
@@ -139,6 +149,52 @@ func _handle_input() -> void:
 	else:
 		firing = Input.is_action_pressed("shoot" if player_id == 1 else "shoot_p2")
 	if firing and fire_cd <= 0.0:
+		fire_cd = FIRE_RATE_BASE / fire_rate_mult
+		_rpc_fire.rpc(global_position, rotation)
+
+func _handle_cpu(delta: float) -> void:
+	# ターゲット（相手）を探す
+	if not is_instance_valid(_cpu_target) or _cpu_target.is_dead:
+		var game = get_tree().get_first_node_in_group("game")
+		if game:
+			for p in game._players.values():
+				if p != self and not p.is_dead:
+					_cpu_target = p
+					break
+	if not is_instance_valid(_cpu_target):
+		velocity = Vector2.ZERO
+		move_and_slide()
+		return
+
+	var to_target = _cpu_target.global_position - global_position
+	var dist = to_target.length()
+
+	# 照準：常に相手を向く
+	rotation = to_target.angle()
+
+	# ジッター：一定間隔で動きをランダムに変える（予測不能に）
+	_cpu_jitter_timer -= delta
+	if _cpu_jitter_timer <= 0.0:
+		_cpu_jitter_timer = randf_range(1.2, 2.8)
+		_cpu_jitter = Vector2(randf_range(-0.4, 0.4), randf_range(-0.4, 0.4))
+		if randf() < 0.25:
+			_cpu_orbit_dir *= -1.0  # 周回方向を反転
+
+	# 移動：理想距離 260px を保ちながら周回
+	var ideal_dist: float = 260.0
+	var dir: Vector2
+	if dist > ideal_dist + 80:
+		dir = to_target.normalized()
+	elif dist < ideal_dist - 80:
+		dir = -to_target.normalized()
+	else:
+		dir = to_target.normalized().rotated(PI * 0.5 * _cpu_orbit_dir)
+
+	velocity = (dir + _cpu_jitter).normalized() * SPEED_BASE * speed_mult * 0.82
+	move_and_slide()
+
+	# 射撃：450px 以内で fire_cd が切れたら撃つ
+	if dist < 450.0 and fire_cd <= 0.0:
 		fire_cd = FIRE_RATE_BASE / fire_rate_mult
 		_rpc_fire.rpc(global_position, rotation)
 
