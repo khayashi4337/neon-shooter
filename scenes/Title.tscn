@@ -62,9 +62,15 @@ theme_override_colors/font_color = Color(0.0, 1.0, 1.0, 1.0)
 
 [node name="LocalBtn" type="Button" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 56)
-text = "ローカル対戦"
+text = "ローカル対戦 (LAN)"
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(1.0, 0.2, 1.0, 1.0)
+
+[node name="SamePCBtn" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 56)
+text = "同PC対戦 (動作確認)"
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.2, 1.0, 0.4, 1.0)
 
 [node name="Spacer2" type="Control" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 20)

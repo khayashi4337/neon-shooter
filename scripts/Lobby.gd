@@ -37,10 +37,21 @@ func _ready() -> void:
 	add_child(_poll_timer)
 
 	# モードに応じて初期UIを設定
-	if Network.game_mode == "local":
-		$Panel/VBox/Title.text = "ローカル対戦"
-		$Panel/VBox/IPRow/IPInput.text = "ws://127.0.0.1:7777"
-		$Panel/VBox/IPRow/IPInput.placeholder_text = "ws://127.0.0.1:7777"
+	match Network.game_mode:
+		"local":
+			$Panel/VBox/Title.text = "ローカル対戦 (LAN)"
+		"samepc":
+			$Panel/VBox/Title.text = "同PC対戦"
+			_host_btn.text = "対戦開始"
+			_join_btn.hide()
+			$Panel/VBox/IPRow.hide()
+
+	# 同PC対戦のJOIN側（コマンドライン引数で判断）
+	if OS.get_cmdline_user_args().has("--join"):
+		_status.text = "自動接続中..."
+		await get_tree().create_timer(0.8).timeout
+		_ip_input.text = "ws://127.0.0.1:" + str(GameConfig.port)
+		_on_join()
 
 func _on_host() -> void:
 	if not Network.host():
@@ -52,8 +63,20 @@ func _on_host() -> void:
 	_ngrok_retries = 0
 
 	if Network.game_mode == "local":
-		_show_ngrok_url("ws://127.0.0.1:7777")
-		_status.text = "ローカルサーバー起動中\n同じPCまたはLAN内から接続可能"
+		var lan_ip = _get_local_ip()
+		var local_url = "ws://" + lan_ip + ":" + str(GameConfig.port)
+		_show_ngrok_url(local_url)
+		_status.text = "LAN サーバー起動中\nこのURLを同じLAN内の相手に送ってください"
+		return
+
+	if Network.game_mode == "samepc":
+		_show_ngrok_url("ws://127.0.0.1:" + str(GameConfig.port))
+		_status.text = "2つ目のウィンドウを起動中..."
+		# 同じGodot実行ファイルを --join フラグ付きで起動
+		var exe = OS.get_executable_path()
+		var project = ProjectSettings.globalize_path("res://")
+		OS.create_process(exe, ["--path", project, "--", "--join"])
+		_status.text = "相手ウィンドウの接続を待っています..."
 		return
 
 	# ① 既存のngrokトンネルが生きているか確認
@@ -147,3 +170,9 @@ func _on_back() -> void:
 	multiplayer.multiplayer_peer = null
 	Network.players.clear()
 	get_tree().change_scene_to_file("res://scenes/Title.tscn")
+
+func _get_local_ip() -> String:
+	for addr in IP.get_local_addresses():
+		if addr.begins_with("192.168.") or addr.begins_with("10.") or addr.begins_with("172."):
+			return addr
+	return "127.0.0.1"
