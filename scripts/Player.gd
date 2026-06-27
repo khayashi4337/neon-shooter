@@ -92,6 +92,20 @@ func _setup_visuals() -> void:
 		eye.position = Vector2(EYE_OFFSET_X, sign * EYE_OFFSET_Y)
 		add_child(eye)
 
+	# HPバー
+	_hp_bar.min_value = 0
+	_hp_bar.max_value = 100
+	_hp_bar.value = 100
+	_hp_bar.show_percentage = false
+	_hp_bar.position = Vector2(-30, -38)
+	_hp_bar.size = Vector2(60, 8)
+	var fill_style = StyleBoxFlat.new()
+	fill_style.bg_color = player_color
+	_hp_bar.add_theme_stylebox_override("fill", fill_style)
+	var bg_style = StyleBoxFlat.new()
+	bg_style.bg_color = Color(0.08, 0.08, 0.08, 0.9)
+	_hp_bar.add_theme_stylebox_override("background", bg_style)
+
 # --- テクスチャ生成ヘルパー ---
 
 func _make_circle_texture(size: int, radius: float, edge: float, col: Color) -> ImageTexture:
@@ -134,19 +148,6 @@ func _make_eye_texture() -> ImageTexture:
 			elif d < EYE_WHITE_R:
 				img.set_pixel(ex, ey, Color(1.0, 1.0, 1.0, 1.0 - (d - EYE_PUPIL_R) / (EYE_WHITE_R - EYE_PUPIL_R)))
 	return ImageTexture.create_from_image(img)
-
-	_hp_bar.min_value = 0
-	_hp_bar.max_value = 100
-	_hp_bar.value = 100
-	_hp_bar.show_percentage = false
-	_hp_bar.position = Vector2(-30, -38)
-	_hp_bar.size = Vector2(60, 8)
-	var fill_style = StyleBoxFlat.new()
-	fill_style.bg_color = player_color
-	_hp_bar.add_theme_stylebox_override("fill", fill_style)
-	var bg_style = StyleBoxFlat.new()
-	bg_style.bg_color = Color(0.08, 0.08, 0.08, 0.9)
-	_hp_bar.add_theme_stylebox_override("background", bg_style)
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
