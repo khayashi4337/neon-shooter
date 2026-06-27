@@ -309,3 +309,17 @@ func reset_for_round(start_pos: Vector2) -> void:
 	fire_cd = 0.0
 	global_position = start_pos
 	rotation = 0.0
+
+func reset_for_new_game(start_pos: Vector2) -> void:
+	max_hp        = GameConfig.player_hp
+	hp            = max_hp
+	speed_mult    = 1.0
+	fire_rate_mult = 1.0
+	can_pierce    = false
+	_hp_bar.max_value = max_hp
+	_hp_bar.value = hp
+	is_dead = false
+	visible = true
+	fire_cd = 0.0
+	global_position = start_pos
+	rotation = 0.0
