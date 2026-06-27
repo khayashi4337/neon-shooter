@@ -296,7 +296,7 @@ func _handle_cpu(delta: float) -> void:
 		if roll < 0.15:
 			# フェイント：狙いをわずかにずらす（約20度以内）
 			aim_angle = rotation + randf_range(-0.35, 0.35)
-		elif roll < 0.50:
+		elif roll < 0.50 and is_instance_valid(_cpu_target):
 			# 予測射撃：プレイヤーの移動先を狙う
 			var time_to_hit = dist / GameConfig.bullet_speed
 			var predicted = _cpu_target.global_position + _cpu_target.velocity * time_to_hit * 0.6
