@@ -81,13 +81,47 @@ Godotエディタのメニューから **Debug → Run Multiple Instances → 2 
 
 ---
 
-## EXEのエクスポート方法（配布用ファイルの作り方）
+## EXEのダウンロード方法（プレイヤー向け）
 
-1. Godotエディタのメニューから **Project → Export**
-2. 「Add Preset」→ **Windows Desktop** を選択
-3. エクスポートテンプレートをダウンロード（初回のみ）
-4. 出力先を `export/` フォルダに設定して **Export Project**
-5. 生成された `neon-shooter.exe` を相手に配布
+1. このページ右側の **[Releases](https://github.com/khayashi4337/neon-shooter/releases)** をクリック
+2. 最新バージョンの `neon-shooter.exe` をダウンロード
+3. ダブルクリックで起動
+
+---
+
+## EXEのエクスポートとリリース方法（開発者向け）
+
+### ステップ1：エクスポートテンプレートのインストール（初回のみ）
+
+1. Godotエディタを開く
+2. メニューの `Editor → Manage Export Templates...`
+3. `Download and Install` をクリック（数分かかる）
+
+### ステップ2：EXEをエクスポート
+
+1. Godotエディタのメニューから `Project → Export`
+2. `Add Preset` → **Windows Desktop** を選択
+3. 出力パスを `export/neon-shooter.exe` に設定
+4. **Export Project** をクリック
+
+またはコマンドラインで：
+
+```
+mkdir export
+godot --headless --export-release "Windows Desktop" export/neon-shooter.exe
+```
+
+### ステップ3：GitHub Releasesにアップロード
+
+バージョン番号を決めて（例：v0.1.0）、以下のコマンドを実行：
+
+```
+gh release create v0.1.0 export/neon-shooter.exe \
+  --title "Neon Shooter v0.1.0" \
+  --notes "最初のリリース"
+```
+
+これで https://github.com/khayashi4337/neon-shooter/releases にEXEが公開される。
 
 ---
 
