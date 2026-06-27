@@ -55,6 +55,7 @@ var speed_mult: float = 1.0
 var fire_rate_mult: float = 1.0
 var can_pierce: bool = false
 var is_dead: bool = false
+var _damage_mult: float = 1.0
 
 var is_cpu: bool = false
 var _cpu_target: Node2D = null
@@ -240,18 +241,22 @@ func _handle_cpu(delta: float) -> void:
 		if randf() < CPU_ORBIT_FLIP_CHANCE:
 			_cpu_orbit_dir *= -1.0
 
-	# --- パワーアップ別の理想距離と戦術フラグ ---
+	# --- パワーアップ別の理想距離と射程 ---
 	var ideal_dist: float = CPU_IDEAL_DIST
-	var armor_mode: bool  = false
 	var fire_range: float = CPU_FIRE_RANGE
 	if can_pierce:
 		# PIERCE：遠距離から壁越し射撃 → 射程延長・遠距離ポジション
 		ideal_dist = CPU_PIERCE_IDEAL_DIST
 		fire_range = CPU_PIERCE_FIRE_RANGE
 	elif max_hp > GameConfig.player_hp:
-		# ARMOR：体力で正面突進 → 射線回避しない
-		ideal_dist = CPU_ARMOR_IDEAL_DIST
-		armor_mode = true
+		# ARMOR：HP残量に応じて戦術を動的に切り替え
+		var hp_ratio = float(hp) / float(max_hp)
+		if hp_ratio > 0.6:
+			ideal_dist = 180.0  # HP高 → 積極的に詰める（射線回避は維持）
+		elif hp_ratio > 0.3:
+			ideal_dist = CPU_IDEAL_DIST  # HP中 → 通常距離
+		else:
+			ideal_dist = CPU_PIERCE_IDEAL_DIST  # HP低 → 遠距離で慎重に
 	elif fire_rate_mult > 1.0:
 		# RAPID：接近して弾幕を張る
 		ideal_dist = CPU_RAPID_IDEAL_DIST
@@ -260,12 +265,10 @@ func _handle_cpu(delta: float) -> void:
 		ideal_dist = CPU_SPEED_IDEAL_DIST
 
 	# --- 射線回避（プレイヤーの照準を読んで横にステップ） ---
-	# ARMORは体力で押し切るため回避しない
 	var aim_dir       = Vector2.from_angle(_cpu_target.rotation)
 	var to_cpu_rel    = global_position - _cpu_target.global_position
 	var cross_val     = aim_dir.cross(to_cpu_rel)
-	var on_aim_line   = (not armor_mode
-	                     and abs(cross_val) < CPU_EVADE_LATERAL
+	var on_aim_line   = (abs(cross_val) < CPU_EVADE_LATERAL
 	                     and aim_dir.dot(to_cpu_rel) > 0.0)
 
 	# --- 移動 ---
@@ -303,7 +306,7 @@ func _rpc_fire(pos: Vector2, angle: float) -> void:
 	b.direction = Vector2(cos(angle), sin(angle))
 	b.owner_id = player_id
 	b.can_pierce = can_pierce
-	b.damage = BULLET_DAMAGE
+	b.damage = max(1, int(BULLET_DAMAGE * _damage_mult))
 	var game = get_tree().get_first_node_in_group("game")
 	if game:
 		game.add_bullet(b)
@@ -334,9 +337,10 @@ func apply_powerup(type: String) -> void:
 		"RAPID":
 			fire_rate_mult = min(fire_rate_mult * 2.0, 8.0)
 		"ARMOR":
-			max_hp = int(max_hp * 1.5)
+			max_hp = max_hp * 2
 			hp = max_hp
 			_hp_bar.max_value = max_hp
+			_damage_mult = max(0.25, _damage_mult * 0.75)
 		"PIERCE":
 			can_pierce = true
 
@@ -356,6 +360,7 @@ func reset_for_new_game(start_pos: Vector2) -> void:
 	speed_mult    = 1.0
 	fire_rate_mult = 1.0
 	can_pierce    = false
+	_damage_mult  = 1.0
 	_hp_bar.max_value = max_hp
 	_hp_bar.value = hp
 	is_dead = false
