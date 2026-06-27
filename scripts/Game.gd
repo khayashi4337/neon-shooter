@@ -29,6 +29,8 @@ var _current_round: int = 1
 var _round_active: bool = false
 var _game_over: bool = false
 var _pw_icon_boxes: Dictionary = {}
+var _ammo_labels: Dictionary = {}
+var _player_colors: Dictionary = {}
 
 @onready var _players_node: Node2D = $PlayersNode
 @onready var _bullets_node: Node2D = $BulletsNode
@@ -153,6 +155,11 @@ func _setup_players() -> void:
 	_pw_icon_boxes[id0] = _make_icon_box(Vector2(20,  70))
 	_pw_icon_boxes[id1] = _make_icon_box(Vector2(870, 70))
 
+	_player_colors[id0] = P1_COLOR
+	_player_colors[id1] = P2_COLOR
+	_ammo_labels[id0] = _make_ammo_label(Vector2(20,  105))
+	_ammo_labels[id1] = _make_ammo_label(Vector2(870, 105))
+
 
 	_update_score_ui()
 	_start_round_countdown()
@@ -168,6 +175,7 @@ func _spawn_player(pid: int, color: Color, start_pos: Vector2) -> void:
 		p.set_multiplayer_authority(1)
 	_players_node.add_child(p)
 	p.died.connect(_on_player_died)
+	p.ammo_changed.connect(_on_ammo_changed)
 	_players[pid] = p
 
 # --- ラウンド制御 ---
@@ -309,6 +317,24 @@ func _update_score_ui() -> void:
 	_p2_score.text = str(_wins.get(ids[1], 0))
 
 # --- パワーアップアイコンUI ---
+
+func _make_ammo_label(pos: Vector2) -> Label:
+	var label = Label.new()
+	label.position = pos
+	label.add_theme_font_size_override("font_size", 13)
+	$UI.add_child(label)
+	return label
+
+func _on_ammo_changed(pid: int, ammo: int, is_reloading: bool) -> void:
+	if not _ammo_labels.has(pid):
+		return
+	var lbl: Label = _ammo_labels[pid]
+	if is_reloading:
+		lbl.text = "RELOAD"
+		lbl.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4))
+	else:
+		lbl.add_theme_color_override("font_color", _player_colors.get(pid, Color.WHITE))
+		lbl.text = "AMMO %d" % ammo
 
 func _make_icon_box(pos: Vector2) -> HBoxContainer:
 	var box = HBoxContainer.new()

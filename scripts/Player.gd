@@ -22,7 +22,9 @@ const PAD_DEADZONE:          float = 0.2
 const PAD_TRIGGER_THRESHOLD: float = 0.5
 
 # --- 弾定数 ---
-const BULLET_DAMAGE: int = 20
+const BULLET_DAMAGE: int  = 20
+const AMMO_MAX:    int    = 12
+const RELOAD_TIME: float  = 2.5
 
 # --- CPU AI 定数 ---
 const CPU_IDEAL_DIST:          float = 260.0
@@ -56,6 +58,8 @@ var fire_rate_mult: float = 1.0
 var can_pierce: bool = false
 var is_dead: bool = false
 var _damage_mult: float = 1.0
+var _ammo: int = 0
+var _reload_timer: float = 0.0
 
 var is_cpu: bool = false
 var _cpu_target: Node2D = null
@@ -69,12 +73,14 @@ var _cpu_jitter: Vector2 = Vector2.ZERO
 @onready var _hp_bar: ProgressBar = $HPBar
 
 signal died(player_id: int)
+signal ammo_changed(player_id: int, ammo: int, is_reloading: bool)
 
 func _ready() -> void:
 	SPEED_BASE     = GameConfig.player_speed
 	FIRE_RATE_BASE = GameConfig.fire_rate
 	hp             = GameConfig.player_hp
 	max_hp         = GameConfig.player_hp
+	_ammo          = AMMO_MAX
 	# CPUプレイヤーは常にサーバー（id=1）が制御
 	set_multiplayer_authority(1 if is_cpu else player_id)
 	_setup_visuals()
@@ -165,6 +171,12 @@ func _physics_process(delta: float) -> void:
 	if is_dead:
 		return
 	fire_cd -= delta
+	if is_multiplayer_authority() and _reload_timer > 0.0:
+		_reload_timer -= delta
+		if _reload_timer <= 0.0:
+			_reload_timer = 0.0
+			_ammo = AMMO_MAX
+			ammo_changed.emit(player_id, _ammo, false)
 	if is_cpu:
 		if is_multiplayer_authority():
 			_handle_cpu(delta)
@@ -208,9 +220,15 @@ func _handle_input() -> void:
 		          or Input.is_joy_button_pressed(pad_id, JOY_BUTTON_RIGHT_SHOULDER))
 	else:
 		firing = Input.is_action_pressed("shoot" if player_id == 1 else "shoot_p2")
-	if firing and fire_cd <= 0.0:
+	if firing and fire_cd <= 0.0 and _ammo > 0 and _reload_timer <= 0.0:
 		fire_cd = FIRE_RATE_BASE / fire_rate_mult
+		_ammo -= 1
 		_rpc_fire.rpc(global_position, rotation)
+		if _ammo <= 0:
+			_reload_timer = RELOAD_TIME
+			ammo_changed.emit(player_id, 0, true)
+		else:
+			ammo_changed.emit(player_id, _ammo, false)
 
 func _handle_cpu(delta: float) -> void:
 	# ターゲット（相手）を探す
@@ -289,8 +307,9 @@ func _handle_cpu(delta: float) -> void:
 	move_and_slide()
 
 	# --- 射撃：偏差打ち + フェイント ---
-	if dist < fire_range and fire_cd <= 0.0:
+	if dist < fire_range and fire_cd <= 0.0 and _ammo > 0 and _reload_timer <= 0.0:
 		fire_cd = FIRE_RATE_BASE / fire_rate_mult
+		_ammo -= 1
 		var aim_angle: float
 		var roll = randf()
 		if roll < 0.15:
@@ -305,6 +324,11 @@ func _handle_cpu(delta: float) -> void:
 			# 通常：現在位置を狙う
 			aim_angle = rotation
 		_rpc_fire.rpc(global_position, aim_angle)
+		if _ammo <= 0:
+			_reload_timer = RELOAD_TIME
+			ammo_changed.emit(player_id, 0, true)
+		else:
+			ammo_changed.emit(player_id, _ammo, false)
 
 @rpc("authority", "call_local", "unreliable_ordered")
 func _rpc_sync(pos: Vector2, rot: float) -> void:
@@ -365,8 +389,11 @@ func reset_for_round(start_pos: Vector2) -> void:
 	is_dead = false
 	visible = true
 	fire_cd = 0.0
+	_ammo = AMMO_MAX
+	_reload_timer = 0.0
 	global_position = start_pos
 	rotation = 0.0
+	ammo_changed.emit(player_id, _ammo, false)
 
 func reset_for_new_game(start_pos: Vector2) -> void:
 	max_hp        = GameConfig.player_hp
@@ -375,6 +402,8 @@ func reset_for_new_game(start_pos: Vector2) -> void:
 	fire_rate_mult = 1.0
 	can_pierce    = false
 	_damage_mult  = 1.0
+	_ammo         = AMMO_MAX
+	_reload_timer = 0.0
 	_hp_bar.max_value = max_hp
 	_hp_bar.value = hp
 	is_dead = false
@@ -382,3 +411,4 @@ func reset_for_new_game(start_pos: Vector2) -> void:
 	fire_cd = 0.0
 	global_position = start_pos
 	rotation = 0.0
+	ammo_changed.emit(player_id, _ammo, false)
