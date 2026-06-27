@@ -38,8 +38,8 @@ func join(url: String) -> bool:
 		else:
 			ws_url = "ws://" + url
 	var peer = WebSocketMultiplayerPeer.new()
-	var headers = PackedStringArray(["ngrok-skip-browser-warning: true"])
-	var err = peer.create_client(ws_url, [], headers)
+	peer.handshake_headers = PackedStringArray(["ngrok-skip-browser-warning: true"])
+	var err = peer.create_client(ws_url)
 	if err != OK:
 		return false
 	multiplayer.multiplayer_peer = peer
