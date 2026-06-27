@@ -1,0 +1,62 @@
+[gd_scene load_steps=3 format=3 uid="uid://gm0001"]
+
+[ext_resource type="Script" path="res://scripts/Game.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://pw0001" path="res://scenes/PowerupMenu.tscn" id="2"]
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1")
+
+[node name="PlayersNode" type="Node2D" parent="."]
+
+[node name="BulletsNode" type="Node2D" parent="."]
+
+[node name="PowerupMenu" parent="." instance=ExtResource("2")]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="ScoreBar" type="HBoxContainer" parent="UI"]
+offset_left = 440.0
+offset_top = 16.0
+offset_right = 840.0
+offset_bottom = 60.0
+
+[node name="P1Score" type="Label" parent="UI/ScoreBar"]
+custom_minimum_size = Vector2(120, 0)
+text = "0"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(0.0, 1.0, 1.0, 1.0)
+
+[node name="VSLabel" type="Label" parent="UI/ScoreBar"]
+custom_minimum_size = Vector2(60, 0)
+text = "vs"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1.0)
+
+[node name="P2Score" type="Label" parent="UI/ScoreBar"]
+custom_minimum_size = Vector2(120, 0)
+text = "0"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(1.0, 0.0, 1.0, 1.0)
+
+[node name="RoundLabel" type="Label" parent="UI"]
+offset_left = 490.0
+offset_top = 62.0
+offset_right = 790.0
+offset_bottom = 92.0
+text = "Round 1"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1.0)
+
+[node name="CenterMsg" type="Label" parent="UI"]
+offset_left = 280.0
+offset_top = 290.0
+offset_right = 1000.0
+offset_bottom = 390.0
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 56

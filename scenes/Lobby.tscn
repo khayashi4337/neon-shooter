@@ -1,0 +1,89 @@
+[gd_scene load_steps=2 format=3 uid="uid://lb0001"]
+
+[ext_resource type="Script" path="res://scripts/Lobby.gd" id="1"]
+
+[node name="Lobby" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.02, 0.06, 1)
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -260.0
+offset_right = 300.0
+offset_bottom = 260.0
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = -20.0
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Panel/VBox"]
+text = "NEON SHOOTER"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 36
+theme_override_colors/font_color = Color(0.0, 1.0, 1.0, 1.0)
+
+[node name="HostBtn" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 52)
+text = "HOST GAME"
+theme_override_font_sizes/font_size = 20
+
+[node name="URLRow" type="HBoxContainer" parent="Panel/VBox"]
+theme_override_constants/separation = 8
+
+[node name="URLLabel" type="LineEdit" parent="Panel/VBox/URLRow"]
+size_flags_horizontal = 3
+editable = false
+placeholder_text = "wss://xxxx.ngrok-free.app"
+theme_override_font_sizes/font_size = 14
+
+[node name="CopyBtn" type="Button" parent="Panel/VBox/URLRow"]
+custom_minimum_size = Vector2(80, 0)
+text = "コピー"
+theme_override_font_sizes/font_size = 14
+
+[node name="IPRow" type="HBoxContainer" parent="Panel/VBox"]
+theme_override_constants/separation = 8
+
+[node name="IPLabel" type="Label" parent="Panel/VBox/IPRow"]
+text = "URL:"
+theme_override_font_sizes/font_size = 16
+
+[node name="IPInput" type="LineEdit" parent="Panel/VBox/IPRow"]
+size_flags_horizontal = 3
+placeholder_text = "wss://xxxx.ngrok-free.app"
+theme_override_font_sizes/font_size = 15
+
+[node name="JoinBtn" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 52)
+text = "JOIN GAME"
+theme_override_font_sizes/font_size = 20
+
+[node name="Status" type="Label" parent="Panel/VBox"]
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1.0)

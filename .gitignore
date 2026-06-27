@@ -1,0 +1,15 @@
+# Godot エディタが生成するキャッシュ（コミット不要）
+.godot/
+
+# インポートキャッシュ
+*.import
+
+# エクスポートされたバイナリ
+export/
+*.exe
+*.pck
+*.apk
+
+# OS
+.DS_Store
+Thumbs.db

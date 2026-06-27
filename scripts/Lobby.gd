@@ -1,0 +1,115 @@
+extends Control
+
+const NGROK_API = "http://localhost:4040/api/tunnels"
+const NGROK_POLL_INTERVAL = 1.0
+const NGROK_MAX_RETRIES = 15
+
+@onready var _host_btn: Button = $Panel/VBox/HostBtn
+@onready var _join_btn: Button = $Panel/VBox/JoinBtn
+@onready var _ip_input: LineEdit = $Panel/VBox/IPRow/IPInput
+@onready var _status: Label = $Panel/VBox/Status
+@onready var _url_row: HBoxContainer = $Panel/VBox/URLRow
+@onready var _url_label: LineEdit = $Panel/VBox/URLRow/URLLabel
+@onready var _copy_btn: Button = $Panel/VBox/URLRow/CopyBtn
+
+var _http: HTTPRequest
+var _ngrok_retries: int = 0
+var _poll_timer: Timer
+
+func _ready() -> void:
+	_host_btn.pressed.connect(_on_host)
+	_join_btn.pressed.connect(_on_join)
+	_copy_btn.pressed.connect(_on_copy)
+	Network.player_connected.connect(_on_player_connected)
+	Network.connection_failed.connect(_on_connection_failed)
+	Network.server_disconnected.connect(_on_server_disconnected)
+
+	_url_row.hide()
+
+	_http = HTTPRequest.new()
+	add_child(_http)
+	_http.request_completed.connect(_on_ngrok_response)
+
+	_poll_timer = Timer.new()
+	_poll_timer.wait_time = NGROK_POLL_INTERVAL
+	_poll_timer.one_shot = false
+	_poll_timer.timeout.connect(_fetch_ngrok_url)
+	add_child(_poll_timer)
+
+func _on_host() -> void:
+	if Network.host():
+		_status.text = "サーバー起動中... ngrok接続待ち"
+		_host_btn.disabled = true
+		_join_btn.disabled = true
+		# ngrokを起動してURLを取得
+		Network.start_ngrok()
+		_ngrok_retries = 0
+		await get_tree().create_timer(1.5).timeout
+		_poll_timer.start()
+	else:
+		_status.text = "サーバー起動失敗"
+
+func _fetch_ngrok_url() -> void:
+	if _ngrok_retries >= NGROK_MAX_RETRIES:
+		_poll_timer.stop()
+		_status.text = "ngrok URLの取得に失敗しました\n手動でURLを確認してください（localhost:4040）"
+		return
+	_ngrok_retries += 1
+	if _http.get_http_client_status() == HTTPClient.STATUS_DISCONNECTED:
+		_http.request(NGROK_API)
+
+func _on_ngrok_response(result: int, _code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	if result != HTTPRequest.RESULT_SUCCESS:
+		return
+	var json = JSON.new()
+	if json.parse(body.get_string_from_utf8()) != OK:
+		return
+	var data = json.get_data()
+	if not data is Dictionary or not data.has("tunnels"):
+		return
+	for tunnel in data["tunnels"]:
+		if tunnel.has("public_url"):
+			var url: String = tunnel["public_url"]
+			# https:// → wss:// に変換して表示
+			var ws_url = "wss://" + url.trim_prefix("https://")
+			_poll_timer.stop()
+			_show_ngrok_url(ws_url)
+			return
+
+func _show_ngrok_url(url: String) -> void:
+	_url_label.text = url
+	_url_row.show()
+	_status.text = "このURLを相手に送ってください ↑\n相手の接続を待っています..."
+
+func _on_copy() -> void:
+	DisplayServer.clipboard_set(_url_label.text)
+	_copy_btn.text = "Copied!"
+	await get_tree().create_timer(1.5).timeout
+	_copy_btn.text = "コピー"
+
+func _on_join() -> void:
+	var url = _ip_input.text.strip_edges()
+	if url.is_empty():
+		_status.text = "URLを入力してください"
+		return
+	if Network.join(url):
+		_status.text = "接続中..."
+		_host_btn.disabled = true
+		_join_btn.disabled = true
+	else:
+		_status.text = "接続失敗"
+
+func _on_player_connected(_id: int) -> void:
+	if Network.players.size() >= 2:
+		await get_tree().create_timer(0.3).timeout
+		get_tree().change_scene_to_file("res://scenes/Game.tscn")
+
+func _on_connection_failed() -> void:
+	_status.text = "接続に失敗しました"
+	_host_btn.disabled = false
+	_join_btn.disabled = false
+
+func _on_server_disconnected() -> void:
+	_status.text = "サーバーが切断されました"
+	_host_btn.disabled = false
+	_join_btn.disabled = false
