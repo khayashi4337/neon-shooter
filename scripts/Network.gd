@@ -45,16 +45,14 @@ func join(url: String) -> bool:
 	multiplayer.multiplayer_peer = peer
 	return true
 
-func start_ngrok() -> int:
-	# ngrokプロセスを起動してPIDを返す
-	var pid = OS.create_process("ngrok", ["http", str(PORT), "--log=stdout"])
-	_ngrok_pid = pid
-	return pid
+func start_ngrok() -> void:
+	# 既存のngrokプロセスを全終了してから新規起動
+	OS.execute("taskkill", ["/F", "/IM", "ngrok.exe"])
+	await get_tree().create_timer(0.8).timeout
+	_ngrok_pid = OS.create_process("ngrok", ["http", str(PORT)])
 
 func stop_ngrok() -> void:
-	if _ngrok_pid > 0:
-		OS.kill(_ngrok_pid)
-		_ngrok_pid = -1
+	OS.execute("taskkill", ["/F", "/IM", "ngrok.exe"])
 
 func get_sorted_ids() -> Array:
 	var ids = players.keys()

@@ -37,21 +37,29 @@ func _ready() -> void:
 	add_child(_poll_timer)
 
 func _on_host() -> void:
-	if Network.host():
-		_status.text = "サーバー起動中... ngrok確認中"
-		_host_btn.disabled = true
-		_join_btn.disabled = true
-		_ngrok_retries = 0
-		# まず既存トンネルを確認、なければngrokを起動
-		_http.request(NGROK_API)
-		await get_tree().create_timer(1.0).timeout
-		if _url_row.visible:
-			return  # 既存トンネルが見つかった
-		Network.start_ngrok()
-		await get_tree().create_timer(1.5).timeout
-		_poll_timer.start()
-	else:
+	if not Network.host():
 		_status.text = "サーバー起動失敗"
+		return
+
+	_host_btn.disabled = true
+	_join_btn.disabled = true
+	_ngrok_retries = 0
+
+	# ① 既存のngrokトンネルが生きているか確認
+	_status.text = "既存のngrokトンネルを確認中..."
+	if _http.get_http_client_status() == HTTPClient.STATUS_DISCONNECTED:
+		_http.request(NGROK_API)
+	await get_tree().create_timer(1.2).timeout
+
+	if _url_row.visible:
+		# 既存トンネルが使えた
+		return
+
+	# ② 使えなかった → 全プロセス終了して新規起動
+	_status.text = "ngrokをリセット中..."
+	await Network.start_ngrok()
+	await get_tree().create_timer(2.0).timeout
+	_poll_timer.start()
 
 func _fetch_ngrok_url() -> void:
 	if _ngrok_retries >= NGROK_MAX_RETRIES:
