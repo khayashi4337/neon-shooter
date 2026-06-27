@@ -72,7 +72,8 @@ func _create_environment() -> void:
 	env.glow_bloom = 0.35
 	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_ADDITIVE
 	env.glow_hdr_threshold = 0.7
-	env.glow_levels = 7
+	for i in range(1, 8):
+		env.set_glow_level(i, 1.0)
 	world_env.environment = env
 	add_child(world_env)
 
@@ -137,6 +138,9 @@ func _spawn_player(pid: int, color: Color, start_pos: Vector2) -> void:
 	p.player_id = pid
 	p.player_color = color
 	p.global_position = start_pos
+	if Network.game_mode == "cpu" and pid == 2:
+		p.is_cpu = true
+		p.set_multiplayer_authority(1)
 	_players_node.add_child(p)
 	p.died.connect(_on_player_died)
 	_players[pid] = p
@@ -185,6 +189,19 @@ func _on_player_died(dead_id: int) -> void:
 
 	await get_tree().create_timer(POWERUP_SHOW_DELAY).timeout
 	_center_msg.text = ""
+
+	# CPUモードでCPUが負けた場合は自動選択
+	if Network.game_mode == "cpu" and dead_id != my_id:
+		var cpu_node = _players.get(dead_id)
+		var choices = ["SPEED", "RAPID", "ARMOR", "PIERCE"]
+		var pick: String
+		if is_instance_valid(cpu_node) and cpu_node.hp < cpu_node.max_hp * 0.4:
+			pick = "ARMOR"  # HP低下時は防御優先
+		else:
+			pick = choices[randi() % choices.size()]
+		_rpc_apply_powerup.rpc(dead_id, pick)
+		return
+
 	_powerup_menu.show_menu(dead_id, dead_id == my_id)
 
 func _on_powerup_chosen_local(loser_id: int, pw: String) -> void:
