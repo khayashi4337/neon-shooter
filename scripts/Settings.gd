@@ -1,22 +1,22 @@
 extends Control
 
-@onready var _port_spin:   SpinBox      = $Panel/ScrollContainer/VBox/PortRow/PortSpin
-@onready var _wins_spin:   SpinBox      = $Panel/ScrollContainer/VBox/WinsRow/WinsSpin
-@onready var _hp_spin:     SpinBox      = $Panel/ScrollContainer/VBox/HPRow/HPSpin
-@onready var _speed_spin:  SpinBox      = $Panel/ScrollContainer/VBox/SpeedRow/SpeedSpin
-@onready var _bullet_spin: SpinBox      = $Panel/ScrollContainer/VBox/BulletRow/BulletSpin
-@onready var _vol_slider:  HSlider      = $Panel/ScrollContainer/VBox/VolumeRow/VolumeSlider
-@onready var _vol_val:     Label        = $Panel/ScrollContainer/VBox/VolumeRow/VolumeVal
-@onready var _p1_device:   OptionButton = $Panel/ScrollContainer/VBox/P1DeviceRow/P1DeviceOpt
-@onready var _p2_device:   OptionButton = $Panel/ScrollContainer/VBox/P2DeviceRow/P2DeviceOpt
-@onready var _title_label: Label        = $Panel/ScrollContainer/VBox/TitleLabel
+@onready var _port_spin:   SpinBox      = %PortSpin
+@onready var _wins_spin:   SpinBox      = %WinsSpin
+@onready var _hp_spin:     SpinBox      = %HPSpin
+@onready var _speed_spin:  SpinBox      = %SpeedSpin
+@onready var _bullet_spin: SpinBox      = %BulletSpin
+@onready var _vol_slider:  HSlider      = %VolumeSlider
+@onready var _vol_val:     Label        = %VolumeVal
+@onready var _p1_device:   OptionButton = %P1DeviceOpt
+@onready var _p2_device:   OptionButton = %P2DeviceOpt
+@onready var _title_label: Label        = %TitleLabel
 
 func _ready() -> void:
 	_build_device_options()
 	_load_ui_from_config()
-	$Panel/ScrollContainer/VBox/BtnRow/SaveBtn.pressed.connect(_on_save)
-	$Panel/ScrollContainer/VBox/BtnRow/ResetBtn.pressed.connect(_on_reset)
-	$Panel/ScrollContainer/VBox/BtnRow/BackBtn.pressed.connect(_on_back)
+	%SaveBtn.pressed.connect(_on_save)
+	%ResetBtn.pressed.connect(_on_reset)
+	%BackBtn.pressed.connect(_on_back)
 	_vol_slider.value_changed.connect(_on_volume_changed)
 
 func _build_device_options() -> void:
@@ -50,20 +50,24 @@ func _on_save() -> void:
 	GameConfig.player_speed = _speed_spin.value
 	GameConfig.bullet_speed = _bullet_spin.value
 	GameConfig.volume       = _vol_slider.value
-	if _p1_device.selected == 0:
-		GameConfig.p1_device = "keyboard"
-	else:
-		GameConfig.p1_device = "gamepad"
-		GameConfig.p1_gamepad_id = _p1_device.selected - 1
-	if _p2_device.selected == 0:
-		GameConfig.p2_device = "keyboard"
-	else:
-		GameConfig.p2_device = "gamepad"
-		GameConfig.p2_gamepad_id = _p2_device.selected - 1
+	_apply_device_opt(_p1_device, 1)
+	_apply_device_opt(_p2_device, 2)
 	GameConfig.save_config()
 	_title_label.text = "設定 ✓"
 	await get_tree().create_timer(1.0).timeout
 	_title_label.text = "設定"
+
+func _apply_device_opt(opt: OptionButton, player: int) -> void:
+	if opt.selected == 0:
+		if player == 1: GameConfig.p1_device = "keyboard"
+		else:           GameConfig.p2_device = "keyboard"
+	else:
+		if player == 1:
+			GameConfig.p1_device     = "gamepad"
+			GameConfig.p1_gamepad_id = opt.selected - 1
+		else:
+			GameConfig.p2_device     = "gamepad"
+			GameConfig.p2_gamepad_id = opt.selected - 1
 
 func _on_reset() -> void:
 	GameConfig.reset_to_defaults()
