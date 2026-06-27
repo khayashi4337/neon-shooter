@@ -202,12 +202,12 @@ func _show_round_result(winner_id: int) -> void:
 
 func _handle_cpu_powerup(dead_id: int) -> void:
 	var cpu_node = _players.get(dead_id)
-	var choices = ["SPEED", "RAPID", "ARMOR", "PIERCE"]
 	var pick: String
 	if is_instance_valid(cpu_node) and cpu_node.hp < cpu_node.max_hp * 0.4:
 		pick = "ARMOR"
 	else:
-		pick = choices[randi() % choices.size()]
+		var pool = _powerup_menu.POWERUPS
+		pick = pool[randi() % pool.size()]
 	_rpc_apply_powerup.rpc(dead_id, pick)
 
 func _on_powerup_chosen_local(loser_id: int, pw: String) -> void:
