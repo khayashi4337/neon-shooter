@@ -1,20 +1,22 @@
 extends CanvasLayer
 
-const POWERUPS = ["SPEED", "RAPID", "ARMOR", "PIERCE"]
+const POWERUPS = ["SPEED", "RAPID", "ARMOR", "PIERCE", "LASER"]
 const DESCRIPTIONS = {
-	"SPEED": "移動速度 +50%",
-	"RAPID": "連射速度 2倍",
-	"ARMOR": "最大HP +50%",
+	"SPEED":  "移動速度 +50%",
+	"RAPID":  "連射速度 2倍",
+	"ARMOR":  "最大HP +50%",
 	"PIERCE": "弾が壁を貫通",
+	"LASER":  "弾がレーザービームに変化",
 }
 const PW_COLORS = {
-	"SPEED":  Color(1.0, 0.9, 0.0),   # 黄（攻撃系）
-	"RAPID":  Color(1.0, 0.85, 0.1),  # 黄（攻撃系）
-	"ARMOR":  Color(0.0, 0.85, 1.0),  # 水色（防御系）
-	"PIERCE": Color(1.0, 0.95, 0.0),  # 黄（攻撃系）
+	"SPEED":  Color(1.0, 0.9,  0.0),
+	"RAPID":  Color(1.0, 0.85, 0.1),
+	"ARMOR":  Color(0.0, 0.85, 1.0),
+	"PIERCE": Color(1.0, 0.95, 0.0),
+	"LASER":  Color(0.3, 1.0,  1.0),
 }
 const PW_TYPES = {
-	"SPEED": "atk", "RAPID": "atk", "ARMOR": "def", "PIERCE": "atk"
+	"SPEED": "atk", "RAPID": "atk", "ARMOR": "def", "PIERCE": "atk", "LASER": "atk"
 }
 
 var _loser_id: int = -1
