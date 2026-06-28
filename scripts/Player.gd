@@ -220,15 +220,19 @@ func _handle_input() -> void:
 		          or Input.is_joy_button_pressed(pad_id, JOY_BUTTON_RIGHT_SHOULDER))
 	else:
 		firing = Input.is_action_pressed("shoot" if player_id == 1 else "shoot_p2")
-	if firing and fire_cd <= 0.0 and _ammo > 0 and _reload_timer <= 0.0:
-		fire_cd = FIRE_RATE_BASE / fire_rate_mult
-		_ammo -= 1
-		_rpc_fire.rpc(global_position, rotation)
-		if _ammo <= 0:
-			_reload_timer = RELOAD_TIME
-			ammo_changed.emit(player_id, 0, true)
+	if firing and fire_cd <= 0.0:
+		if _ammo <= 0 or _reload_timer > 0.0:
+			AudioManager.play_dry_fire()
+			fire_cd = 0.4
 		else:
-			ammo_changed.emit(player_id, _ammo, false)
+			fire_cd = FIRE_RATE_BASE / fire_rate_mult
+			_ammo -= 1
+			_rpc_fire.rpc(global_position, rotation)
+			if _ammo <= 0:
+				_reload_timer = RELOAD_TIME
+				ammo_changed.emit(player_id, 0, true)
+			else:
+				ammo_changed.emit(player_id, _ammo, false)
 
 func _handle_cpu(delta: float) -> void:
 	# ターゲット（相手）を探す
@@ -361,6 +365,7 @@ func take_damage(amount: int) -> void:
 func _die() -> void:
 	is_dead = true
 	visible = false
+	AudioManager.play_death()
 	died.emit(player_id)
 
 func _flash() -> void:

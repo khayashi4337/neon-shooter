@@ -70,5 +70,6 @@ func _on_body_entered(body: Node) -> void:
 		if not can_pierce:
 			queue_free()
 	elif not ("player_id" in body):
+		AudioManager.play_wall_hit()
 		if not can_pierce:
 			queue_free()

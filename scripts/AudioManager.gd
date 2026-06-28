@@ -1,53 +1,40 @@
 extends Node
 
-const SAMPLE_RATE = 22050.0
+const SFX  = "res://assets/sounds/sci-fi-sounds/Audio/"
+const IMP  = "res://assets/sounds/impact-sounds/Audio/"
+const INF  = "res://assets/sounds/interface-sounds/Audio/"
+
 var _players: Array[AudioStreamPlayer] = []
+var _snd: Dictionary = {}
 
 func _ready() -> void:
-	for i in range(8):
+	for i in range(16):
 		var p = AudioStreamPlayer.new()
 		p.bus = "Master"
 		add_child(p)
 		_players.append(p)
+	_preload_all()
 
-func play_shoot() -> void:
-	_play_gunshot()
+func _preload_all() -> void:
+	# 0始まり (000, 001, ...)
+	_snd["shoot"]    = _load_group(SFX, "laserSmall_%03d.ogg",       5, 0)
+	_snd["hit"]      = _load_group(IMP, "impactPunch_heavy_%03d.ogg", 5, 0)
+	_snd["wall_hit"] = _load_group(IMP, "impactMetal_heavy_%03d.ogg", 5, 0)
+	_snd["death"]    = _load_group(SFX, "explosionCrunch_%03d.ogg",   5, 0)
+	# 1始まり (001, 002, ...)
+	_snd["dry_fire"] = _load_group(INF, "error_%03d.ogg",      8, 1)
+	_snd["powerup"]  = _load_group(INF, "confirmation_%03d.ogg", 4, 1)
+	_snd["countdown"]= _load_group(INF, "tick_%03d.ogg",       4, 1)  # 003は欠番のため4まで試みる
+	_snd["win"]      = _load_group(INF, "maximize_%03d.ogg",    9, 1)
+	_snd["lose"]     = _load_group(INF, "minimize_%03d.ogg",    9, 1)
 
-func _play_gunshot() -> void:
-	var p = _get_free_player()
-	var gen = AudioStreamGenerator.new()
-	var duration = 0.09
-	gen.mix_rate = SAMPLE_RATE
-	gen.buffer_length = duration + 0.05
-	p.stream = gen
-	p.volume_db = linear_to_db(0.75)
-	p.play()
-	var pb := p.get_stream_playback() as AudioStreamGeneratorPlayback
-	if not pb:
-		return
-	var frames = int(SAMPLE_RATE * duration)
-	for i in range(frames):
-		var t = float(i) / float(frames)
-		var env = exp(-t * 28.0)              # 急速指数減衰：鋭いアタック
-		var noise = randf() * 2.0 - 1.0       # ホワイトノイズ（主成分）
-		var body = sin(TAU * 110.0 * float(i) / SAMPLE_RATE)  # 低音ボディ
-		var sample = clamp((noise * 0.75 + body * 0.45) * env, -1.0, 1.0)
-		pb.push_frame(Vector2(sample, sample))
-
-func play_hit() -> void:
-	_play_noise(0.08, 0.5)
-
-func play_round_win() -> void:
-	_play_sequence_async([523, 659, 784, 1047], 0.13)
-
-func play_round_lose() -> void:
-	_play_sequence_async([523, 440, 349, 261], 0.13)
-
-func play_powerup() -> void:
-	_play_sequence_async([440, 660, 880, 1320], 0.09)
-
-func play_countdown() -> void:
-	_play_tone(440.0, 0.12, 0.4)
+func _load_group(base: String, pattern: String, count: int, start: int) -> Array:
+	var arr: Array = []
+	for i in range(start, start + count):
+		var path = base + (pattern % i)
+		if ResourceLoader.exists(path):
+			arr.append(load(path))
+	return arr
 
 func _get_free_player() -> AudioStreamPlayer:
 	for p in _players:
@@ -55,45 +42,40 @@ func _get_free_player() -> AudioStreamPlayer:
 			return p
 	return _players[0]
 
-func _play_tone(freq: float, duration: float, volume: float = 0.4) -> void:
-	var p = _get_free_player()
-	var gen = AudioStreamGenerator.new()
-	gen.mix_rate = SAMPLE_RATE
-	gen.buffer_length = duration + 0.05
-	p.stream = gen
-	p.volume_db = linear_to_db(volume)
-	p.play()
-	var pb := p.get_stream_playback() as AudioStreamGeneratorPlayback
-	if not pb:
+func _play_random(category: String, vol_db: float = 0.0) -> void:
+	var arr: Array = _snd.get(category, [])
+	if arr.is_empty():
 		return
-	var frames = int(SAMPLE_RATE * duration)
-	var phase = 0.0
-	for i in range(frames):
-		var t = float(i) / float(frames)
-		var env = sin(t * PI)
-		var sample = sin(phase * TAU) * env
-		pb.push_frame(Vector2(sample, sample))
-		phase = fmod(phase + freq / SAMPLE_RATE, 1.0)
-
-func _play_noise(duration: float, volume: float = 0.5) -> void:
 	var p = _get_free_player()
-	var gen = AudioStreamGenerator.new()
-	gen.mix_rate = SAMPLE_RATE
-	gen.buffer_length = duration + 0.05
-	p.stream = gen
-	p.volume_db = linear_to_db(volume)
+	p.stream = arr[randi() % arr.size()]
+	p.volume_db = vol_db
 	p.play()
-	var pb := p.get_stream_playback() as AudioStreamGeneratorPlayback
-	if not pb:
-		return
-	var frames = int(SAMPLE_RATE * duration)
-	for i in range(frames):
-		var t = float(i) / float(frames)
-		var env = pow(1.0 - t, 1.5)
-		var sample = (randf() * 2.0 - 1.0) * env
-		pb.push_frame(Vector2(sample, sample))
 
-func _play_sequence_async(freqs: Array, note_dur: float) -> void:
-	for freq in freqs:
-		_play_tone(float(freq), note_dur, 0.4)
-		await get_tree().create_timer(note_dur).timeout
+# --- 公開API ---
+
+func play_shoot() -> void:
+	_play_random("shoot", -4.0)
+
+func play_hit() -> void:
+	_play_random("hit", 0.0)
+
+func play_wall_hit() -> void:
+	_play_random("wall_hit", -8.0)
+
+func play_death() -> void:
+	_play_random("death", 2.0)
+
+func play_dry_fire() -> void:
+	_play_random("dry_fire", -2.0)
+
+func play_powerup() -> void:
+	_play_random("powerup", 0.0)
+
+func play_countdown() -> void:
+	_play_random("countdown", 0.0)
+
+func play_round_win() -> void:
+	_play_random("win", 0.0)
+
+func play_round_lose() -> void:
+	_play_random("lose", 0.0)
