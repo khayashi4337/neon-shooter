@@ -13,6 +13,7 @@ const PW_ICON_COLORS = {
 	"RAPID":   Color(1.0, 0.7,  0.1),
 	"ARMOR":   Color(0.0, 0.85, 1.0),
 	"PIERCE":  Color(0.9, 0.9,  0.0),
+	"LASER":   Color(0.3, 1.0,  1.0),
 	"BOUNCE":  Color(0.0, 1.0,  0.5),
 	"SHOTGUN": Color(1.0, 0.5,  0.0),
 	"SHIELD":  Color(0.5, 0.5,  1.0),
@@ -20,7 +21,7 @@ const PW_ICON_COLORS = {
 }
 const PW_ICON_LABELS = {
 	"SPEED": "SPD", "RAPID":   "RPC", "ARMOR":   "ARM", "PIERCE":  "PRC",
-	"BOUNCE": "BNC","SHOTGUN": "SHG", "SHIELD":  "SLD", "REFLECT": "RFL",
+	"LASER": "LSR", "BOUNCE": "BNC","SHOTGUN": "SHG", "SHIELD":  "SLD", "REFLECT": "RFL",
 }
 
 var _players: Dictionary = {}
@@ -240,8 +241,9 @@ func _handle_cpu_powerup(dead_id: int) -> void:
 	if is_instance_valid(cpu_node):
 		var armor_level = cpu_node.max_hp / GameConfig.player_hp  # 1=未取得, 2=1回, 4=2回
 		if armor_level >= 2:
-			# ARMORを既に持っている → 攻撃系を優先してARMORを除外
 			pool.erase("ARMOR")
+		if cpu_node.is_laser:
+			pool.erase("LASER")
 	if pool.is_empty():
 		pool = _powerup_menu.POWERUPS
 	var pick = pool[randi() % pool.size()]

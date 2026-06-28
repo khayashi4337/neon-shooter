@@ -56,6 +56,7 @@ var fire_cd: float = 0.0
 var speed_mult: float = 1.0
 var fire_rate_mult: float = 1.0
 var can_pierce: bool = false
+var is_laser: bool = false
 var is_dead: bool = false
 var _damage_mult: float = 1.0
 var _ammo: int = 0
@@ -270,6 +271,10 @@ func _handle_cpu(delta: float) -> void:
 		# PIERCE：遠距離から壁越し射撃 → 射程延長・遠距離ポジション
 		ideal_dist = CPU_PIERCE_IDEAL_DIST
 		fire_range = CPU_PIERCE_FIRE_RANGE
+	elif is_laser:
+		# LASER：長距離から正確に射撃
+		ideal_dist = CPU_PIERCE_IDEAL_DIST
+		fire_range = CPU_PIERCE_FIRE_RANGE
 	elif max_hp > GameConfig.player_hp:
 		# ARMOR：取得回数が多いほど積極的、HP瀕死時のみ守り
 		var hp_ratio = float(hp) / float(max_hp)
@@ -342,12 +347,16 @@ func _rpc_sync(pos: Vector2, rot: float) -> void:
 
 @rpc("authority", "call_local", "reliable")
 func _rpc_fire(pos: Vector2, angle: float) -> void:
-	AudioManager.play_shoot()
+	if is_laser:
+		AudioManager.play_laser_shoot()
+	else:
+		AudioManager.play_shoot()
 	var b = BULLET_SCENE.instantiate()
 	b.global_position = pos + Vector2(cos(angle), sin(angle)) * 28.0
 	b.direction = Vector2(cos(angle), sin(angle))
 	b.owner_id = player_id
 	b.can_pierce = can_pierce
+	b.is_laser = is_laser
 	b.damage = max(1, int(BULLET_DAMAGE * _damage_mult))
 	var game = get_tree().get_first_node_in_group("game")
 	if game:
@@ -386,6 +395,8 @@ func apply_powerup(type: String) -> void:
 			_damage_mult = max(0.25, _damage_mult * 0.75)
 		"PIERCE":
 			can_pierce = true
+		"LASER":
+			is_laser = true
 
 func reset_for_round(start_pos: Vector2) -> void:
 	hp = max_hp
@@ -406,6 +417,7 @@ func reset_for_new_game(start_pos: Vector2) -> void:
 	speed_mult    = 1.0
 	fire_rate_mult = 1.0
 	can_pierce    = false
+	is_laser      = false
 	_damage_mult  = 1.0
 	_ammo         = AMMO_MAX
 	_reload_timer = 0.0
