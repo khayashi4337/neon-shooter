@@ -3,6 +3,7 @@ extends Node
 const SFX  = "res://assets/sounds/sci-fi-sounds/Audio/"
 const IMP  = "res://assets/sounds/impact-sounds/Audio/"
 const INF  = "res://assets/sounds/interface-sounds/Audio/"
+const GAME = "res://assets/sounds/game-sounds/"
 
 var _players: Array[AudioStreamPlayer] = []
 var _snd: Dictionary = {}
@@ -17,7 +18,7 @@ func _ready() -> void:
 
 func _preload_all() -> void:
 	# 0始まり (000, 001, ...)
-	_snd["shoot"]       = _load_group(SFX, "lowFrequency_explosion_%03d.ogg", 2, 0)
+	_snd["shoot"]       = _load_group(GAME, "pop_gun_%d.ogg", 5, 1)
 	_snd["laser_shoot"] = _load_group(SFX, "laserLarge_%03d.ogg",    5, 0)
 	_snd["hit"]      = _load_group(IMP, "impactPunch_heavy_%03d.ogg", 5, 0)
 	_snd["wall_hit"] = _load_group(IMP, "impactMetal_heavy_%03d.ogg", 5, 0)
@@ -55,7 +56,7 @@ func _play_random(category: String, vol_db: float = 0.0) -> void:
 # --- 公開API ---
 
 func play_shoot() -> void:
-	_play_random("shoot", 1.0)
+	_play_random("shoot", -2.0)
 
 func play_laser_shoot() -> void:
 	_play_random("laser_shoot", -4.0)
