@@ -9,15 +9,40 @@ const DEATH = "res://assets/sounds/death-sounds/"
 var _players: Array[AudioStreamPlayer] = []
 var _snd: Dictionary = {}
 
+const CFG_PATH = "res://assets/sounds/sfx_config.json"
+
 func _ready() -> void:
 	for i in range(16):
 		var p = AudioStreamPlayer.new()
 		p.bus = "Master"
 		add_child(p)
 		_players.append(p)
-	_preload_all()
+	if not _load_from_config():
+		_preload_default()
 
-func _preload_all() -> void:
+func _load_from_config() -> bool:
+	if not FileAccess.file_exists(CFG_PATH):
+		return false
+	var f := FileAccess.open(CFG_PATH, FileAccess.READ)
+	if f == null:
+		return false
+	var text := f.get_as_text()
+	f.close()
+	var json := JSON.new()
+	if json.parse(text) != OK:
+		return false
+	var data = json.get_data()
+	if not data is Dictionary:
+		return false
+	for cat in data:
+		_snd[cat] = []
+		for entry in data[cat]:
+			var path: String = entry["path"]
+			if ResourceLoader.exists(path):
+				_snd[cat].append(load(path))
+	return true
+
+func _preload_default() -> void:
 	# 0始まり (000, 001, ...)
 	_snd["shoot"]       = _load_group(GAME, "pop_gun_%d.ogg", 5, 1)
 	_snd["laser_shoot"] = _load_group(SFX, "laserLarge_%03d.ogg",    5, 0)
