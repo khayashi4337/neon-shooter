@@ -19,6 +19,19 @@ var p2_device: String = "gamepad"
 var p1_gamepad_id: int = 0
 var p2_gamepad_id: int = 1
 
+# キーバインド（keycode整数値。KEY_*定数と同値）
+var key_p1_up:    int = KEY_W
+var key_p1_down:  int = KEY_S
+var key_p1_left:  int = KEY_A
+var key_p1_right: int = KEY_D
+var key_p1_shoot: int = KEY_SPACE
+
+var key_p2_up:    int = KEY_I
+var key_p2_down:  int = KEY_K
+var key_p2_left:  int = KEY_J
+var key_p2_right: int = KEY_L
+var key_p2_shoot: int = KEY_ENTER
+
 # 内部設定（設定ファイルのみで管理）
 var ngrok_poll_interval: float = 1.0
 var ngrok_max_retries: int = 20
@@ -29,21 +42,36 @@ const CONFIG_PATH = "user://config.cfg"
 func _ready() -> void:
 	load_config()
 	_apply_volume()
-	_setup_move_actions()
+	apply_keybinds()
 
-func _setup_move_actions() -> void:
-	_ensure_action("move_left",  [KEY_A, KEY_LEFT])
-	_ensure_action("move_right", [KEY_D, KEY_RIGHT])
-	_ensure_action("move_up",    [KEY_W, KEY_UP])
-	_ensure_action("move_down",  [KEY_S, KEY_DOWN])
+# --- キーバインド ---
 
-func _ensure_action(action: String, keys: Array) -> void:
+func apply_keybinds() -> void:
+	_set_action("move_up",       [key_p1_up])
+	_set_action("move_down",     [key_p1_down])
+	_set_action("move_left",     [key_p1_left])
+	_set_action("move_right",    [key_p1_right])
+	_set_action("shoot",         [key_p1_shoot])
+	# P1 射撃はマウス左ボタンも常時有効
+	var mouse_ev = InputEventMouseButton.new()
+	mouse_ev.button_index = MOUSE_BUTTON_LEFT
+	InputMap.action_add_event("shoot", mouse_ev)
+	_set_action("move_up_p2",    [key_p2_up])
+	_set_action("move_down_p2",  [key_p2_down])
+	_set_action("move_left_p2",  [key_p2_left])
+	_set_action("move_right_p2", [key_p2_right])
+	_set_action("shoot_p2",      [key_p2_shoot])
+
+func _set_action(action: String, keycodes: Array) -> void:
 	if not InputMap.has_action(action):
 		InputMap.add_action(action)
-	for k in keys:
+	InputMap.action_erase_events(action)
+	for kc in keycodes:
 		var ev = InputEventKey.new()
-		ev.keycode = k
+		ev.keycode = kc
 		InputMap.action_add_event(action, ev)
+
+# --- 設定の保存・ロード ---
 
 func load_config() -> void:
 	var cfg = ConfigFile.new()
@@ -63,6 +91,16 @@ func load_config() -> void:
 	ngrok_poll_interval = cfg.get_value("advanced", "ngrok_poll_interval", ngrok_poll_interval)
 	ngrok_max_retries   = cfg.get_value("advanced", "ngrok_max_retries",   ngrok_max_retries)
 	ngrok_startup_wait  = cfg.get_value("advanced", "ngrok_startup_wait",  ngrok_startup_wait)
+	key_p1_up    = cfg.get_value("keybinds", "p1_up",    key_p1_up)
+	key_p1_down  = cfg.get_value("keybinds", "p1_down",  key_p1_down)
+	key_p1_left  = cfg.get_value("keybinds", "p1_left",  key_p1_left)
+	key_p1_right = cfg.get_value("keybinds", "p1_right", key_p1_right)
+	key_p1_shoot = cfg.get_value("keybinds", "p1_shoot", key_p1_shoot)
+	key_p2_up    = cfg.get_value("keybinds", "p2_up",    key_p2_up)
+	key_p2_down  = cfg.get_value("keybinds", "p2_down",  key_p2_down)
+	key_p2_left  = cfg.get_value("keybinds", "p2_left",  key_p2_left)
+	key_p2_right = cfg.get_value("keybinds", "p2_right", key_p2_right)
+	key_p2_shoot = cfg.get_value("keybinds", "p2_shoot", key_p2_shoot)
 
 func save_config() -> void:
 	var cfg = ConfigFile.new()
@@ -80,6 +118,16 @@ func save_config() -> void:
 	cfg.set_value("advanced", "ngrok_poll_interval", ngrok_poll_interval)
 	cfg.set_value("advanced", "ngrok_max_retries",   ngrok_max_retries)
 	cfg.set_value("advanced", "ngrok_startup_wait",  ngrok_startup_wait)
+	cfg.set_value("keybinds", "p1_up",    key_p1_up)
+	cfg.set_value("keybinds", "p1_down",  key_p1_down)
+	cfg.set_value("keybinds", "p1_left",  key_p1_left)
+	cfg.set_value("keybinds", "p1_right", key_p1_right)
+	cfg.set_value("keybinds", "p1_shoot", key_p1_shoot)
+	cfg.set_value("keybinds", "p2_up",    key_p2_up)
+	cfg.set_value("keybinds", "p2_down",  key_p2_down)
+	cfg.set_value("keybinds", "p2_left",  key_p2_left)
+	cfg.set_value("keybinds", "p2_right", key_p2_right)
+	cfg.set_value("keybinds", "p2_shoot", key_p2_shoot)
 	cfg.save(CONFIG_PATH)
 
 func reset_to_defaults() -> void:
@@ -97,8 +145,19 @@ func reset_to_defaults() -> void:
 	ngrok_poll_interval = 1.0
 	ngrok_max_retries   = 20
 	ngrok_startup_wait  = 5.0
+	key_p1_up    = KEY_W
+	key_p1_down  = KEY_S
+	key_p1_left  = KEY_A
+	key_p1_right = KEY_D
+	key_p1_shoot = KEY_SPACE
+	key_p2_up    = KEY_I
+	key_p2_down  = KEY_K
+	key_p2_left  = KEY_J
+	key_p2_right = KEY_L
+	key_p2_shoot = KEY_ENTER
 	save_config()
 	_apply_volume()
+	apply_keybinds()
 
 func _apply_volume() -> void:
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(volume))

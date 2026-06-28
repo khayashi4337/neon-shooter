@@ -200,8 +200,8 @@ func _handle_input() -> void:
 		if dir.length() < PAD_DEADZONE:
 			dir = Vector2.ZERO
 	else:
-		# WASD（move_*）+ カーソルキー（ui_*）の両方を受け付ける
-		dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+		var sfx = "" if player_id == 1 else "_p2"
+		dir = Input.get_vector("move_left" + sfx, "move_right" + sfx, "move_up" + sfx, "move_down" + sfx)
 	velocity = dir * SPEED_BASE * speed_mult
 	move_and_slide()
 
