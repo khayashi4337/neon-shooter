@@ -141,11 +141,12 @@ func _build_keybind_ui() -> void:
 
 		vbox.add_child(hbox)
 
-	# SaveBtn の直前に挿入
-	var parent   = %SaveBtn.get_parent()
-	var save_idx = %SaveBtn.get_index()
-	parent.add_child(scroll)
-	parent.move_child(scroll, save_idx)
+	# BtnRow（HBoxContainer）の親 VBox に、BtnRow 直前で挿入
+	var btn_row  = %SaveBtn.get_parent()          # HBoxContainer (BtnRow)
+	var vbox_par = btn_row.get_parent()            # VBoxContainer
+	var btn_idx  = btn_row.get_index()
+	vbox_par.add_child(scroll)
+	vbox_par.move_child(scroll, btn_idx)
 
 func _make_header() -> HBoxContainer:
 	var hbox = HBoxContainer.new()
