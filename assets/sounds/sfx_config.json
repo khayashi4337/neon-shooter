@@ -74,7 +74,35 @@
   "death": [
     {
       "id": "death_1",
-      "path": "res://assets/sounds/sci-fi-sounds/Audio/explosionCrunch_000.ogg"
+      "path": "res://assets/sounds/death-sounds/splat_01.ogg"
+    },
+    {
+      "id": "death_2",
+      "path": "res://assets/sounds/death-sounds/splat_02.ogg"
+    },
+    {
+      "id": "death_3",
+      "path": "res://assets/sounds/death-sounds/splat_03.ogg"
+    },
+    {
+      "id": "death_4",
+      "path": "res://assets/sounds/death-sounds/splat_04.ogg"
+    },
+    {
+      "id": "death_5",
+      "path": "res://assets/sounds/death-sounds/splat_05.ogg"
+    },
+    {
+      "id": "death_6",
+      "path": "res://assets/sounds/death-sounds/splat_06.ogg"
+    },
+    {
+      "id": "death_7",
+      "path": "res://assets/sounds/death-sounds/splat_07.ogg"
+    },
+    {
+      "id": "death_8",
+      "path": "res://assets/sounds/death-sounds/splat_08.ogg"
     }
   ],
   "dry_fire": [
