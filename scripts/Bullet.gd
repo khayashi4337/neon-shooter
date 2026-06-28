@@ -12,11 +12,13 @@ const COLOR_BODY:    Color = Color(1.0, 1.0, 0.3)
 const COLOR_LIGHT:   Color = Color(1.0, 1.0, 0.2)
 
 # レーザービーム定数
-const LASER_W:     int   = 40
-const LASER_H:     int   = 6
-const LASER_COLOR: Color = Color(0.3, 1.0, 1.0)
+const LASER_W:          int   = 40
+const LASER_H:          int   = 6
+const LASER_COLOR:      Color = Color(0.3, 1.0, 1.0)
 const LASER_LIGHT_ENERGY: float = 3.5
-const TRAIL_MAX:   int   = 14
+const TRAIL_MAX:        int   = 14
+const LASER_SPEED_MULT: float = 1.8
+const LASER_DAMAGE:     int   = 12
 
 var direction: Vector2 = Vector2.RIGHT
 var owner_id: int = 1
@@ -38,6 +40,7 @@ func _ready() -> void:
 	var t := get_tree().create_timer(LIFE_TIME)
 	t.timeout.connect(_cleanup)
 	if is_laser:
+		damage = LASER_DAMAGE
 		_setup_trail()
 
 func _setup_visuals() -> void:
@@ -115,7 +118,8 @@ func _setup_trail() -> void:
 	get_parent().add_child(_trail)
 
 func _physics_process(delta: float) -> void:
-	global_position += direction * GameConfig.bullet_speed * delta
+	var spd = GameConfig.bullet_speed * (LASER_SPEED_MULT if is_laser else 1.0)
+	global_position += direction * spd * delta
 	if is_instance_valid(_trail):
 		_trail_pts.push_front(global_position)
 		if _trail_pts.size() > TRAIL_MAX:
