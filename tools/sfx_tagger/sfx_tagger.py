@@ -323,7 +323,13 @@ class SfxTagger:
         }
         self._save_db()
         self._saved_lbl.config(text="✓ 保存しました")
+        yview_top = self._listbox.yview()[0]
+        sel = self._listbox.curselection()
+        sel_idx = sel[0] if sel else None
         self._refresh_list(self._filter_var.get())
+        self._listbox.yview_moveto(yview_top)
+        if sel_idx is not None and sel_idx < self._listbox.size():
+            self._listbox.selection_set(sel_idx)
         self._update_stat()
 
     def _update_stat(self):
