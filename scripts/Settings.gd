@@ -125,12 +125,10 @@ func _build_keybind_ui() -> void:
 func _keycode_name(keycode: int) -> String:
 	if keycode == KEY_NONE:
 		return "(なし)"
-	var ev = InputEventKey.new()
-	ev.keycode = keycode
-	var t = ev.as_text()
-	# Godot 4 は "Physical KeyCode" などを付けることがある → 簡潔にする
-	t = t.replace("Physical ", "").replace("KeyCode ", "")
-	return t
+	var name = OS.get_keycode_string(keycode)
+	if name.is_empty():
+		return "Key %d" % keycode
+	return name
 
 func _start_capture(action: String, prop: String, btn: Button) -> void:
 	if _waiting_action != "":
