@@ -19,13 +19,16 @@ func _ready() -> void:
 func _preload_all() -> void:
 	# 0始まり (000, 001, ...)
 	_snd["shoot"]       = _load_group(GAME, "pop_gun_%d.ogg", 5, 1)
+	_snd["shoot"].append_array(_load_paths([SFX + "laserSmall_004.ogg"]))  # 通常弾の発射音
 	_snd["laser_shoot"] = _load_group(SFX, "laserLarge_%03d.ogg",    5, 0)
+	_snd["laser_shoot"].append_array(_load_paths([INF + "close_002.ogg"]))  # レーザ単発
 	_snd["hit"]      = _load_group(IMP, "impactPunch_heavy_%03d.ogg", 5, 0)
 	_snd["wall_hit"] = _load_group(IMP, "impactMetal_heavy_%03d.ogg", 5, 0)
 	_snd["death"]    = _load_group(SFX, "explosionCrunch_%03d.ogg",   5, 0)
 	# 1始まり (001, 002, ...)
 	_snd["dry_fire"] = _load_group(INF, "error_%03d.ogg",      8, 1)
 	_snd["powerup"]  = _load_group(INF, "confirmation_%03d.ogg", 4, 1)
+	_snd["powerup"].append_array(_load_paths([INF + "glass_004.ogg"]))  # パワーアップ取得音
 	_snd["countdown"]= _load_group(INF, "tick_%03d.ogg",       4, 1)  # 003は欠番のため4まで試みる
 	_snd["win"]      = _load_group(INF, "maximize_%03d.ogg",    9, 1)
 	_snd["lose"]     = _load_group(INF, "minimize_%03d.ogg",    9, 1)
@@ -34,6 +37,13 @@ func _load_group(base: String, pattern: String, count: int, start: int) -> Array
 	var arr: Array = []
 	for i in range(start, start + count):
 		var path = base + (pattern % i)
+		if ResourceLoader.exists(path):
+			arr.append(load(path))
+	return arr
+
+func _load_paths(paths: Array) -> Array:
+	var arr: Array = []
+	for path in paths:
 		if ResourceLoader.exists(path):
 			arr.append(load(path))
 	return arr
