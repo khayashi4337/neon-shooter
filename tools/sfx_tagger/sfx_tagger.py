@@ -18,6 +18,10 @@ except ImportError:
 
 AUDIO_EXTS = {".ogg", ".wav", ".mp3", ".flac"}
 
+# sfx_tagger.py → tools/sfx_tagger/ → tools/ → neon-shooter/ → assets/sounds/
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_DEFAULT_SOUNDS_DIR = os.path.join(_REPO_ROOT, "assets", "sounds")
+
 TAG_DEFS = [
     ("weapon",  "武器 / 射撃"),
     ("laser",   "レーザー"),
@@ -207,7 +211,8 @@ class SfxTagger:
 
     # ── ディレクトリ選択 ─────────────────────────────────────────────────
     def _open_dir(self):
-        d = filedialog.askdirectory(title="音ファイルが入ったフォルダを選択")
+        initial = _DEFAULT_SOUNDS_DIR if os.path.exists(_DEFAULT_SOUNDS_DIR) else os.path.expanduser("~")
+        d = filedialog.askdirectory(title="音ファイルが入ったフォルダを選択", initialdir=initial)
         if not d:
             return
         self.scan_dir = d
