@@ -10,14 +10,10 @@
     },
     {
       "id": "shoot_3",
-      "path": "res://assets/sounds/game-sounds/pop_gun_3.ogg"
-    },
-    {
-      "id": "shoot_4",
       "path": "res://assets/sounds/game-sounds/pop_gun_4.ogg"
     },
     {
-      "id": "shoot_5",
+      "id": "shoot_4",
       "path": "res://assets/sounds/game-sounds/pop_gun_5.ogg"
     }
   ],
@@ -68,22 +64,10 @@
   "wall_hit": [
     {
       "id": "wall_hit_1",
-      "path": "res://assets/sounds/impact-sounds/Audio/impactMetal_heavy_000.ogg"
-    },
-    {
-      "id": "wall_hit_2",
-      "path": "res://assets/sounds/impact-sounds/Audio/impactMetal_heavy_001.ogg"
-    },
-    {
-      "id": "wall_hit_3",
       "path": "res://assets/sounds/impact-sounds/Audio/impactMetal_heavy_002.ogg"
     },
     {
-      "id": "wall_hit_4",
-      "path": "res://assets/sounds/impact-sounds/Audio/impactMetal_heavy_003.ogg"
-    },
-    {
-      "id": "wall_hit_5",
+      "id": "wall_hit_2",
       "path": "res://assets/sounds/impact-sounds/Audio/impactMetal_heavy_004.ogg"
     }
   ],
@@ -91,55 +75,15 @@
     {
       "id": "death_1",
       "path": "res://assets/sounds/sci-fi-sounds/Audio/explosionCrunch_000.ogg"
-    },
-    {
-      "id": "death_2",
-      "path": "res://assets/sounds/sci-fi-sounds/Audio/explosionCrunch_001.ogg"
-    },
-    {
-      "id": "death_3",
-      "path": "res://assets/sounds/sci-fi-sounds/Audio/explosionCrunch_002.ogg"
-    },
-    {
-      "id": "death_4",
-      "path": "res://assets/sounds/sci-fi-sounds/Audio/explosionCrunch_003.ogg"
-    },
-    {
-      "id": "death_5",
-      "path": "res://assets/sounds/sci-fi-sounds/Audio/explosionCrunch_004.ogg"
     }
   ],
   "dry_fire": [
     {
       "id": "dry_fire_1",
-      "path": "res://assets/sounds/interface-sounds/Audio/error_001.ogg"
-    },
-    {
-      "id": "dry_fire_2",
-      "path": "res://assets/sounds/interface-sounds/Audio/error_002.ogg"
-    },
-    {
-      "id": "dry_fire_3",
-      "path": "res://assets/sounds/interface-sounds/Audio/error_003.ogg"
-    },
-    {
-      "id": "dry_fire_4",
-      "path": "res://assets/sounds/interface-sounds/Audio/error_004.ogg"
-    },
-    {
-      "id": "dry_fire_5",
       "path": "res://assets/sounds/interface-sounds/Audio/error_005.ogg"
     },
     {
-      "id": "dry_fire_6",
-      "path": "res://assets/sounds/interface-sounds/Audio/error_006.ogg"
-    },
-    {
-      "id": "dry_fire_7",
-      "path": "res://assets/sounds/interface-sounds/Audio/error_007.ogg"
-    },
-    {
-      "id": "dry_fire_8",
+      "id": "dry_fire_2",
       "path": "res://assets/sounds/interface-sounds/Audio/error_008.ogg"
     }
   ],
@@ -169,85 +113,33 @@
     {
       "id": "countdown_2",
       "path": "res://assets/sounds/interface-sounds/Audio/tick_002.ogg"
-    },
-    {
-      "id": "countdown_3",
-      "path": "res://assets/sounds/interface-sounds/Audio/tick_004.ogg"
     }
   ],
   "win": [
     {
       "id": "win_1",
-      "path": "res://assets/sounds/interface-sounds/Audio/maximize_001.ogg"
-    },
-    {
-      "id": "win_2",
-      "path": "res://assets/sounds/interface-sounds/Audio/maximize_002.ogg"
-    },
-    {
-      "id": "win_3",
       "path": "res://assets/sounds/interface-sounds/Audio/maximize_003.ogg"
-    },
-    {
-      "id": "win_4",
-      "path": "res://assets/sounds/interface-sounds/Audio/maximize_004.ogg"
-    },
-    {
-      "id": "win_5",
-      "path": "res://assets/sounds/interface-sounds/Audio/maximize_005.ogg"
-    },
-    {
-      "id": "win_6",
-      "path": "res://assets/sounds/interface-sounds/Audio/maximize_006.ogg"
-    },
-    {
-      "id": "win_7",
-      "path": "res://assets/sounds/interface-sounds/Audio/maximize_007.ogg"
-    },
-    {
-      "id": "win_8",
-      "path": "res://assets/sounds/interface-sounds/Audio/maximize_008.ogg"
-    },
-    {
-      "id": "win_9",
-      "path": "res://assets/sounds/interface-sounds/Audio/maximize_009.ogg"
     }
   ],
   "lose": [
     {
       "id": "lose_1",
-      "path": "res://assets/sounds/interface-sounds/Audio/minimize_001.ogg"
-    },
-    {
-      "id": "lose_2",
-      "path": "res://assets/sounds/interface-sounds/Audio/minimize_002.ogg"
-    },
-    {
-      "id": "lose_3",
       "path": "res://assets/sounds/interface-sounds/Audio/minimize_003.ogg"
     },
     {
-      "id": "lose_4",
+      "id": "lose_2",
       "path": "res://assets/sounds/interface-sounds/Audio/minimize_004.ogg"
     },
     {
-      "id": "lose_5",
-      "path": "res://assets/sounds/interface-sounds/Audio/minimize_005.ogg"
-    },
-    {
-      "id": "lose_6",
+      "id": "lose_3",
       "path": "res://assets/sounds/interface-sounds/Audio/minimize_006.ogg"
     },
     {
-      "id": "lose_7",
-      "path": "res://assets/sounds/interface-sounds/Audio/minimize_007.ogg"
-    },
-    {
-      "id": "lose_8",
+      "id": "lose_4",
       "path": "res://assets/sounds/interface-sounds/Audio/minimize_008.ogg"
     },
     {
-      "id": "lose_9",
+      "id": "lose_5",
       "path": "res://assets/sounds/interface-sounds/Audio/minimize_009.ogg"
     }
   ]
