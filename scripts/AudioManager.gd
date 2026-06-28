@@ -1,9 +1,10 @@
 extends Node
 
-const SFX  = "res://assets/sounds/sci-fi-sounds/Audio/"
-const IMP  = "res://assets/sounds/impact-sounds/Audio/"
-const INF  = "res://assets/sounds/interface-sounds/Audio/"
-const GAME = "res://assets/sounds/game-sounds/"
+const SFX   = "res://assets/sounds/sci-fi-sounds/Audio/"
+const IMP   = "res://assets/sounds/impact-sounds/Audio/"
+const INF   = "res://assets/sounds/interface-sounds/Audio/"
+const GAME  = "res://assets/sounds/game-sounds/"
+const DEATH = "res://assets/sounds/death-sounds/"
 
 var _players: Array[AudioStreamPlayer] = []
 var _snd: Dictionary = {}
@@ -22,7 +23,7 @@ func _preload_all() -> void:
 	_snd["laser_shoot"] = _load_group(SFX, "laserLarge_%03d.ogg",    5, 0)
 	_snd["hit"]      = _load_group(IMP, "impactPunch_heavy_%03d.ogg", 5, 0)
 	_snd["wall_hit"] = _load_group(IMP, "impactMetal_heavy_%03d.ogg", 5, 0)
-	_snd["death"]    = _load_group(SFX, "explosionCrunch_%03d.ogg",   5, 0)
+	_snd["death"]    = _load_group(DEATH, "splat_%02d.ogg", 8, 1)
 	# 1始まり (001, 002, ...)
 	_snd["dry_fire"] = _load_group(INF, "error_%03d.ogg",      8, 1)
 	_snd["powerup"]  = _load_group(INF, "confirmation_%03d.ogg", 4, 1)
